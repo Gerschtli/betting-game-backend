@@ -1,0 +1,6 @@
+__pycache__/*
+*.egg-info/
+*.nixops-*
+*.pyc
+nixops/dev.nixops
+result
