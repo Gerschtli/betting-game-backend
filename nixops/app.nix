@@ -26,5 +26,9 @@ rec {
     };
   };
 
-  libraries = ps: [ ps.flask ];
+  libraries = ps: [
+    ps.flask
+    ps.flask_migrate
+    ps.flask_sqlalchemy
+  ];
 }
