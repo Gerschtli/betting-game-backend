@@ -51,8 +51,10 @@ in
         ];
 
         services.mysql = {
-          # set password with:
-          # SET PASSWORD FOR root@localhost = PASSWORD('password');
+          # Need to run:
+          # CREATE DATABASE betting_game;
+          # CREATE USER 'betting_game'@'127.0.0.1' IDENTIFIED BY 'testpw';
+          # GRANT ALL PRIVILEGES ON betting_game.* TO 'betting_game'@'127.0.0.1';
           enable = true;
           package = pkgs.mariadb;
         };
@@ -62,6 +64,7 @@ in
           after = [ "network.target" ];
           wantedBy = [ "multi-user.target" ];
           environment = {
+            APP_CONFIG_FILE = appDir + "/config/dev.py";
             FLASK_APP = appDir + "/app";
             FLASK_ENV = "development";
           };
