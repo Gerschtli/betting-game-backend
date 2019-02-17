@@ -6,7 +6,7 @@ in
 {
   network.description = app.description;
 
-  node =
+  bgb =
     { config, lib, pkgs, ... }:
     lib.mkMerge [
       {
@@ -34,11 +34,21 @@ in
       }
 
       {
-        networking.firewall = {
-          enable = true;
-          allowedTCPPorts = [ 5000 ];
-          allowPing = true;
-        };
+        nixpkgs.overlays = [
+          # fix reloading bug in flask development server
+          # see https://github.com/NixOS/nixpkgs/issues/42924#issuecomment-409101368
+          (self: super: {
+            python36Packages = (super.python36Packages or {}) // {
+              werkzeug = super.python36Packages.werkzeug.overrideAttrs (oldAttrs: rec {
+                postPatch = ''
+                  substituteInPlace werkzeug/_reloader.py \
+                    --replace "rv = [sys.executable]" "return sys.argv"
+                '';
+                doCheck = false;
+              });
+            };
+          })
+        ];
 
         services.mysql = {
           # set password with:
@@ -53,10 +63,14 @@ in
           wantedBy = [ "multi-user.target" ];
           environment = {
             FLASK_APP = appDir + "/app";
-            # FLASK_ENV = "development";
+            FLASK_ENV = "development";
           };
           serviceConfig = {
-            ExecStart = "${pkgs.python36Packages.flask}/bin/flask run --host=0.0.0.0";
+            ExecStart =
+              let
+                python = pkgs.python36.withPackages (ps: app.libraries ps);
+              in
+                "${python}/bin/python -m flask run --host=0.0.0.0 --port=${toString app.port}";
             User = app.user;
             Restart = "always";
           };
