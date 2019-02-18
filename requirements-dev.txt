@@ -1,1 +1,5 @@
+flake8
+isort
+pycodestyle
+pyflakes
 pytest
