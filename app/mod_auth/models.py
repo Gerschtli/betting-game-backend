@@ -34,12 +34,8 @@ class Token(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     jti = db.Column(db.String(255), nullable=False)
-    user_id = db.Column(
-        db.Integer,
-        db.ForeignKey('user.id', ondelete="CASCADE"),
-        nullable=False)
-    expires = db.Column(
-        db.DateTime, nullable=False, default=datetime.datetime.now)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete="CASCADE"), nullable=False)
+    expires = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
     revoked = db.Column(db.Boolean, nullable=False)
 
     def save(self):

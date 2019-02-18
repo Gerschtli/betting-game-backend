@@ -1,32 +1,27 @@
 from flask import Blueprint
-from flask_jwt_extended import jwt_required, get_raw_jwt
+from flask_jwt_extended import get_raw_jwt, jwt_required
 from flask_restful import Api, Resource, reqparse
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.mod_auth.models import User, Token
+from app.mod_auth.models import Token, User
 from app.mod_auth.util import create_token
 
 mod_auth = Blueprint('auth', __name__, url_prefix='/auth')
 
-parser = reqparse.RequestParser()
-parser.add_argument(
-    'username', help='This field cannot be blank', required=True)
-parser.add_argument(
-    'password', help='This field cannot be blank', required=True)
+PARSER = reqparse.RequestParser()
+PARSER.add_argument('username', help='This field cannot be blank', required=True)
+PARSER.add_argument('password', help='This field cannot be blank', required=True)
 
 
 class UserRegistration(Resource):
-    def post(self):
-        data = parser.parse_args()
+    @staticmethod
+    def post():
+        data = PARSER.parse_args()
 
         if User.find_by_username(data['username']):
-            return {
-                'message': 'User {} already exists'.format(data['username'])
-            }
+            return {'message': 'User {} already exists'.format(data['username'])}
 
-        new_user = User(
-            username=data['username'],
-            password=User.generate_hash(data['password']))
+        new_user = User(username=data['username'], password=User.generate_hash(data['password']))
 
         try:
             new_user.save()
@@ -41,14 +36,13 @@ class UserRegistration(Resource):
 
 
 class UserLogin(Resource):
-    def post(self):
-        data = parser.parse_args()
+    @staticmethod
+    def post():
+        data = PARSER.parse_args()
         current_user = User.find_by_username(data['username'])
 
         if not current_user:
-            return {
-                'message': 'User {} doesn\'t exist'.format(data['username'])
-            }
+            return {'message': 'User {} doesn\'t exist'.format(data['username'])}
 
         if User.verify_hash(data['password'], current_user.password):
             access_token = create_token(current_user)
@@ -57,13 +51,14 @@ class UserLogin(Resource):
                 'message': 'Logged in as {}'.format(current_user.username),
                 'access_token': access_token,
             }
-        else:
-            return {'message': 'Wrong credentials'}
+
+        return {'message': 'Wrong credentials'}
 
 
 class UserLogout(Resource):
     @jwt_required
-    def post(self):
+    @staticmethod
+    def post():
         jti = get_raw_jwt()['jti']
         try:
             token = Token.find_by_jti(jti)
@@ -77,7 +72,8 @@ class UserLogout(Resource):
 
 class SecretResource(Resource):
     @jwt_required
-    def get(self):
+    @staticmethod
+    def get():
         return {'answer': 42}
 
 
