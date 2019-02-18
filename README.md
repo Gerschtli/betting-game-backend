@@ -1,1 +1,1 @@
-# betting game backend
+# betting game backend [![Travis CI](https://img.shields.io/travis/Gerschtli/betting-game-backend.svg?style=flat-square)](https://travis-ci.org/Gerschtli/betting-game-backend) [![Codecov](https://img.shields.io/codecov/c/github/Gerschtli/betting-game-backend/master.svg?style=flat-square)](https://codecov.io/gh/Gerschtli/betting-game-backend)
