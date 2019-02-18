@@ -6,7 +6,11 @@ pkgs.python36Packages.buildPythonApplication rec {
 
   src = ./.;
 
-  doCheck = false;
-
   propagatedBuildInputs = (import ./nixops/app.nix).libraries pkgs.python36Packages;
+
+  checkInputs = with pkgs.python36Packages; [
+    pytest pytestrunner
+  ];
+  preCheck = "export APP_CONFIG_FILE=${./app/config/dev.py}";
+  postCheck = "export APP_CONFIG_FILE=";
 }

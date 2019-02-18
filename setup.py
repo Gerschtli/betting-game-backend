@@ -18,6 +18,8 @@ setup(
     url="https://github.com/Gerschtli/betting-game-backend",
     license="MIT",
     install_requires=requirements,
+    setup_requires=["pytest-runner"],
+    tests_require=["pytest"],
     data_files=[
         ('migrations', ['migrations/alembic.ini', 'migrations/env.py']),
         ('migrations/versions', glob('migrations/versions/*.py')),
