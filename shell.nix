@@ -5,6 +5,7 @@ with import <nixpkgs> { };
 
   buildInputs = old.buildInputs
     ++ (with python36Packages; [
+      coverage
       flake8
       git-crypt
       isort
