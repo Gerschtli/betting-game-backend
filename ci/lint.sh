@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -x
+set -xe
 
 pycodestyle                    app tests
 isort --check-only --recursive app tests

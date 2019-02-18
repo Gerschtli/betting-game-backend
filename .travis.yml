@@ -11,6 +11,8 @@ matrix:
         - pip install -r requirements-dev.txt
       before_script:
         - export APP_CONFIG_FILE=$PWD/app/config/dev.py
+        # remove encrypted file
+        - rm app/config/prod.py
       script:
         - ./ci/lint.sh
         - coverage run setup.py test
