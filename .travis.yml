@@ -9,6 +9,8 @@ matrix:
         - pip install codecov coverage
         - pip install -r requirements.txt
         - pip install -r requirements-dev.txt
+      before_script:
+        - export APP_CONFIG_FILE=$PWD/app/config/dev.py
       script:
         - ./ci/lint.sh
         - coverage run setup.py test
