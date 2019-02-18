@@ -1,2 +1,2 @@
 *.nixops   binary filter=git-crypt
-config/prod.py  binary filter=git-crypt diff=git-crypt
+app/config/prod.py  binary filter=git-crypt diff=git-crypt
