@@ -1,5 +1,3 @@
-# pragma: no cover
-
 import datetime
 
 JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(hours=8)

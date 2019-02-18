@@ -1,5 +1,3 @@
-# pragma: no cover
-
 SECRET_KEY = 'secret'
 
 JWT_SECRET_KEY = 'jwt-secret-string'
