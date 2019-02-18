@@ -34,6 +34,8 @@ in
       }
 
       {
+        networking.firewall.allowedTCPPorts = [ config.services.mysql.port ];
+
         nixpkgs.overlays = [
           # fix reloading bug in flask development server
           # see https://github.com/NixOS/nixpkgs/issues/42924#issuecomment-409101368
@@ -53,8 +55,10 @@ in
         services.mysql = {
           # Need to run:
           # CREATE DATABASE betting_game;
-          # CREATE USER 'betting_game'@'127.0.0.1' IDENTIFIED BY 'testpw';
-          # GRANT ALL PRIVILEGES ON betting_game.* TO 'betting_game'@'127.0.0.1';
+          # CREATE USER 'betting_game'@'%' IDENTIFIED BY 'testpw';
+          # GRANT ALL PRIVILEGES ON betting_game.* TO 'betting_game'@'%';
+          # CREATE USER 'betting_game'@'localhost' IDENTIFIED BY 'testpw';
+          # GRANT ALL PRIVILEGES ON betting_game.* TO 'betting_game'@'localhost';
           enable = true;
           package = pkgs.mariadb;
         };
@@ -64,19 +68,22 @@ in
           after = [ "network.target" ];
           wantedBy = [ "multi-user.target" ];
           environment = {
-            APP_CONFIG_FILE = appDir + "/config/dev.py";
+            APP_CONFIG_FILE = appDir + "/app/config/dev.py";
             FLASK_APP = appDir + "/app";
             FLASK_ENV = "development";
           };
-          serviceConfig = {
-            ExecStart =
-              let
-                python = pkgs.python36.withPackages (ps: app.libraries ps);
-              in
-                "${python}/bin/python -m flask run --host=0.0.0.0 --port=${toString app.port}";
-            User = app.user;
-            Restart = "always";
-          };
+          serviceConfig =
+            let python = pkgs.python36.withPackages (ps: app.libraries ps); in
+            {
+              ExecStartPre = ''
+                ${python}/bin/python -m flask db upgrade --directory=${appDir}/migrations
+              '';
+              ExecStart = ''
+                ${python}/bin/python -m flask run --host=0.0.0.0 --port=${toString app.port}
+              '';
+              User = app.user;
+              Restart = "always";
+            };
         };
       }
 

@@ -9,7 +9,6 @@ with import <nixpkgs> { };
       python-language-server
     ]);
 
-  APP_CONFIG_FILE = toString ./config/dev.py;
-
+  APP_CONFIG_FILE = toString app/config/cli.py;
   PYTHONDONTWRITEBYTECODE = 1;
 })

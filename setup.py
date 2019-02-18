@@ -1,4 +1,5 @@
-from setuptools import setup
+from glob import glob
+from setuptools import find_packages, setup
 
 with open("README.md", "rb") as f:
     long_descr = f.read().decode()
@@ -8,7 +9,7 @@ with open("requirements.txt", "rb") as f:
 
 setup(
     name="betting-game-backend",
-    packages=["app"],
+    packages=find_packages(),
     version="0.1.0",
     description="Backend for soccer betting game.",
     long_description=long_descr,
@@ -17,4 +18,8 @@ setup(
     url="https://github.com/Gerschtli/betting-game-backend",
     license="MIT",
     install_requires=requirements,
+    data_files=[
+        ('migrations', ['migrations/alembic.ini', 'migrations/env.py']),
+        ('migrations/versions', glob('migrations/versions/*.py')),
+    ],
 )

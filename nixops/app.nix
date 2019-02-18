@@ -30,5 +30,6 @@ rec {
     ps.flask
     ps.flask_migrate
     ps.flask_sqlalchemy
+    ps.mysqlclient
   ];
 }
