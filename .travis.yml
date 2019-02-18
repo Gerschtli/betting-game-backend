@@ -1,0 +1,34 @@
+sudo: required
+
+matrix:
+  include:
+    - python: 3.6
+      language: python
+      cache: pip
+      install:
+        - pip install codecov coverage
+        - pip install -r requirements.txt
+        - pip install -r requirements-dev.txt
+      script:
+        - ./ci/lint.sh
+        - coverage run setup.py test
+      after_success:
+        - codecov
+
+    - language: nix
+      name: nix build on nixpkgs-unstable
+      before_script:
+        - nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
+        - nix-channel --update
+        - nix eval nixpkgs.python36.version
+      script:
+        - nix build --verbose
+
+    - language: nix
+      name: nix build on nixos-18.09
+      before_script:
+        - nix-channel --add https://nixos.org/channels/nixos-18.09 nixpkgs
+        - nix-channel --update
+        - nix eval nixpkgs.python36.version
+      script:
+        - nix build --verbose
