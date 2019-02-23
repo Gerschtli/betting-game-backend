@@ -39,12 +39,12 @@
 set -e
 
 # Check for Nix tools.
-command -v nix-shell >/dev/null 2>&1 || {
+command -v nix >/dev/null 2>&1 || {
   nix_profile="$HOME/.nix-profile/etc/profile.d/nix.sh"
   if [ -e "$nix_profile" ]; then
     source "$nix_profile"
   else
-    >&2 echo "Failed to find 'nix-shell' on PATH or a Nix profile to load. Have you installed Nix?"
+    >&2 echo "Failed to find 'nix' on PATH or a Nix profile to load. Have you installed Nix?"
     exit 1
   fi
 }
@@ -56,13 +56,13 @@ deployment="$1"
 command="$2"
 state_file="$here/${deployment}.nixops"
 
-source "$here/nixpkgs-version.sh"
+nixpkgs_snapshot="https://releases.nixos.org/nixos/18.09/nixos-18.09.2132.109a28ab954/nixexprs.tar.xz"
 
 export NIX_PATH=nixpkgs="$nixpkgs_snapshot":"$repo_root":.
 export NIXOPS_STATE="$state_file"
 export NIXOPS_DEPLOYMENT="$deployment"
 
-withNixops="nix-shell -p $nixops_version --run"
+withNixops="nix run nixpkgs.nixops --unset PYTHONPATH --command"
 
 # Arg list trick:
 # https://stackoverflow.com/questions/3104209
@@ -70,10 +70,10 @@ withNixops="nix-shell -p $nixops_version --run"
 
 if [[ $deployment == --* ]]; then
   ARGS=$(printf "%q"" " "$@")
-  $withNixops "nixops $ARGS"
+  $withNixops nixops $ARGS
   exit $?
 elif [ "$command" == ".shell" ]; then
-  nix-shell -p "$nixops_version"
+  nix run nixpkgs.nixops nixpkgs.bashInteractive --unset PYTHONPATH --command bash
 elif [ ! -e "$state_file" ] && [ "$command" != "create" ]; then
   >&2 echo "You're trying to use a deployment that doesn't exist yet. Try running $0 $deployment create"
   exit 1
@@ -82,5 +82,5 @@ elif [ -e "$state_file" ] && [ "$command" == "create" ]; then
   exit 1
 else
   ARGS=$(printf "%q"" " "${@:2}")
-  $withNixops "nixops $ARGS"
+  $withNixops nixops $ARGS
 fi
