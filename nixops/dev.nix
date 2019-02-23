@@ -73,7 +73,7 @@ in
             FLASK_ENV = "development";
           };
           serviceConfig =
-            let python = pkgs.python36.withPackages (ps: app.libraries ps); in
+            let python = pkgs.python36.withPackages app.libraries; in
             {
               ExecStartPre = ''
                 ${python}/bin/python -m flask db upgrade --directory=${appDir}/migrations
