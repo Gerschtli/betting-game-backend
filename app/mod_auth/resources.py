@@ -5,16 +5,15 @@ from flask_restful import Api
 from ..models import Token, User
 from ..resource import AuthenticatedResource, Resource
 from ..response import no_content
-from ..validator import schemas, validate_input, validate_schema
-from ..validator.matcher import MinLength, UniqueUsername
+from ..validator import matcher, schemas, validate_input, validate_schema
 from .util import create_token
 
 
 class UserRegistration(Resource):
     @validate_schema(schemas.USER)
     @validate_input({
-        'username': UniqueUsername(),
-        'password': MinLength(6),
+        'username': matcher.And(matcher.NotBlank(), matcher.UniqueUsername()),
+        'password': matcher.MinLength(6),
     })
     def post(self):
         data = request.get_json()

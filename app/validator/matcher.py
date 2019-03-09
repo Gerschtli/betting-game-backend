@@ -17,6 +17,18 @@ class Matcher(ABC):
         pass
 
 
+class And(Matcher):
+    def __init__(self, *matchers):
+        self._matchers = matchers
+
+    def validate(self, data, path):
+        errors = []
+        for matcher in self._matchers:
+            errors.extend(matcher.validate(data, path))
+
+        return errors
+
+
 class MinLength(Matcher):
     def __init__(self, min_length):
         self._min_length = min_length
@@ -26,6 +38,14 @@ class MinLength(Matcher):
             return []
 
         return [_error('min_length', path, {'value': self._min_length})]
+
+
+class NotBlank(Matcher):
+    def validate(self, data, path):
+        if data:
+            return []
+
+        return [_error('not_blank', path)]
 
 
 class UniqueUsername(Matcher):
