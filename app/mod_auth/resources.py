@@ -1,32 +1,25 @@
-from flask import Blueprint
+from flask import Blueprint, request
 from flask_jwt_extended import get_raw_jwt, jwt_required
-from flask_restful import Api, Resource, reqparse
-from sqlalchemy.exc import SQLAlchemyError
+from flask_restful import Api, Resource
 
 from ..models import Token, User
+from ..validator import validate_input, validate_schema, schemas
+from ..validator.matcher import MinLength, UniqueUsername
 from .util import create_token
-
-mod_auth = Blueprint('auth', __name__, url_prefix='/auth')
-
-PARSER = reqparse.RequestParser()
-PARSER.add_argument('username', help='This field cannot be blank', required=True)
-PARSER.add_argument('password', help='This field cannot be blank', required=True)
 
 
 class UserRegistration(Resource):
     @staticmethod
+    @validate_schema(schemas.USER)
+    @validate_input({
+        'username': UniqueUsername(),
+        'password': MinLength(6),
+    })
     def post():
-        data = PARSER.parse_args()
-
-        if User.find_by_username(data['username']):
-            return {'message': 'User {} already exists'.format(data['username'])}
+        data = request.get_json()
 
         new_user = User(username=data['username'], password=User.generate_hash(data['password']))
-
-        try:
-            new_user.save()
-        except SQLAlchemyError:
-            return {'message': 'Something went wrong'}, 500
+        new_user.save()
 
         access_token = create_token(new_user)
         return {
@@ -37,22 +30,20 @@ class UserRegistration(Resource):
 
 class UserLogin(Resource):
     @staticmethod
+    @validate_schema(schemas.USER)
     def post():
-        data = PARSER.parse_args()
+        data = request.get_json()
         current_user = User.find_by_username(data['username'])
 
-        if not current_user:
-            return {'message': 'User {} doesn\'t exist'.format(data['username'])}
+        if not current_user or not User.verify_hash(data['password'], current_user.password):
+            return {'message': 'Wrong credentials'}
 
-        if User.verify_hash(data['password'], current_user.password):
-            access_token = create_token(current_user)
+        access_token = create_token(current_user)
 
-            return {
-                'message': 'Logged in as {}'.format(current_user.username),
-                'access_token': access_token,
-            }
-
-        return {'message': 'Wrong credentials'}
+        return {
+            'message': 'Logged in as {}'.format(current_user.username),
+            'access_token': access_token,
+        }
 
 
 class UserLogout(Resource):
@@ -60,14 +51,12 @@ class UserLogout(Resource):
     @staticmethod
     def post():
         jti = get_raw_jwt()['jti']
-        try:
-            token = Token.find_by_jti(jti)
-            token.revoked = True
-            token.save()
 
-            return {'message': 'Access token has been revoked'}
-        except SQLAlchemyError:
-            return {'message': 'Something went wrong'}, 500
+        token = Token.find_by_jti(jti)
+        token.revoked = True
+        token.save()
+
+        return {'message': 'Access token has been revoked'}
 
 
 class SecretResource(Resource):
@@ -77,6 +66,7 @@ class SecretResource(Resource):
         return {'answer': 42}
 
 
+mod_auth = Blueprint('auth', __name__, url_prefix='/auth')
 api = Api(mod_auth)
 
 api.add_resource(UserRegistration, '/registration')
