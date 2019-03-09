@@ -2,6 +2,7 @@ from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import SQLAlchemyError
 
 from .config import default as default_config
 
@@ -17,6 +18,11 @@ migrate = Migrate(app, db)
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({'message': 'Not Found'}), 404
+
+
+@app.errorhandler(SQLAlchemyError)
+def database_error(error):
+    return jsonify({'message': 'Internal Server Error'}), 500
 
 
 @jwt.token_in_blacklist_loader
