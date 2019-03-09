@@ -20,7 +20,7 @@ def _validate(config, data, path):
 def validate_input(schema):
     def wrapper(fn):
         @wraps(fn)
-        def decorated():
+        def decorated(*args, **kwargs):
             errors = []
             data = request.get_json()
 
@@ -30,7 +30,7 @@ def validate_input(schema):
             if errors:
                 raise InputValidationError(errors)
 
-            return fn()
+            return fn(*args, **kwargs)
 
         return decorated
 
@@ -40,7 +40,7 @@ def validate_input(schema):
 def validate_schema(schema):
     def wrapper(fn):
         @wraps(fn)
-        def decorated():
+        def decorated(*args, **kwargs):
             schema["$schema"] = "http://json-schema.org/draft-07/schema#"
             schema["additionalProperties"] = False
 
@@ -50,7 +50,7 @@ def validate_schema(schema):
             if len(errors) > 0:
                 raise SchemaValidationError(errors)
 
-            return fn()
+            return fn(*args, **kwargs)
 
         return decorated
 
