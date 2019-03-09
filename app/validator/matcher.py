@@ -3,16 +3,17 @@ from abc import ABC, abstractmethod
 from ..models import User
 
 
+def _error(type, path, options=None):
+    dict = {'type': type, 'path': path}
+    if options is not None:
+        dict['options'] = options
+
+    return dict
+
+
 class Matcher(ABC):
     @abstractmethod
-    def is_valid(self, data):
-        pass
-
-    def options(self):
-        return {}
-
-    @abstractmethod
-    def type(self):
+    def validate(self, data, path):
         pass
 
 
@@ -20,19 +21,16 @@ class MinLength(Matcher):
     def __init__(self, min_length):
         self._min_length = min_length
 
-    def is_valid(self, data):
-        return len(data) >= self._min_length
+    def validate(self, data, path):
+        if len(data) >= self._min_length:
+            return []
 
-    def options(self):
-        return {'value': self._min_length}
-
-    def type(self):
-        return 'min_length'
+        return [_error('min_length', path, {'value': self._min_length})]
 
 
 class UniqueUsername(Matcher):
-    def is_valid(self, data):
-        return not User.find_by_username(data)
+    def validate(self, data, path):
+        if not User.find_by_username(data):
+            return []
 
-    def type(self):
-        return 'unique_username'
+        return [_error('unique_username', path)]

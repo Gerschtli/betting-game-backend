@@ -6,17 +6,6 @@ from flask import request
 from ..errors import InputValidationError, SchemaValidationError
 
 
-def _validate(config, data, path):
-    if config.is_valid(data):
-        return []
-
-    return [{
-        'type': config.type(),
-        'path': path,
-        'options': config.options(),
-    }]
-
-
 def validate_input(schema):
     def wrapper(fn):
         @wraps(fn)
@@ -25,7 +14,7 @@ def validate_input(schema):
             data = request.get_json()
 
             for key in schema:
-                errors.extend(_validate(schema[key], data[key], key))
+                errors.extend(schema[key].validate(data[key], key))
 
             if errors:
                 raise InputValidationError(errors)
