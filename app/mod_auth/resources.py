@@ -1,37 +1,33 @@
 from flask import Blueprint, request
-from flask_jwt_extended import get_raw_jwt, jwt_required
-from flask_restful import Api, Resource
+from flask_jwt_extended import get_raw_jwt
+from flask_restful import Api
 
 from ..models import Token, User
-from ..validator import validate_input, validate_schema, schemas
+from ..resource import AuthenticatedResource, Resource
+from ..response import no_content
+from ..validator import schemas, validate_input, validate_schema
 from ..validator.matcher import MinLength, UniqueUsername
 from .util import create_token
 
 
 class UserRegistration(Resource):
-    @staticmethod
     @validate_schema(schemas.USER)
     @validate_input({
         'username': UniqueUsername(),
         'password': MinLength(6),
     })
-    def post():
+    def post(self):
         data = request.get_json()
 
         new_user = User(username=data['username'], password=User.generate_hash(data['password']))
         new_user.save()
 
-        access_token = create_token(new_user)
-        return {
-            'message': 'User {} was created'.format(data['username']),
-            'access_token': access_token,
-        }
+        return no_content()
 
 
 class UserLogin(Resource):
-    @staticmethod
     @validate_schema(schemas.USER)
-    def post():
+    def post(self):
         data = request.get_json()
         current_user = User.find_by_username(data['username'])
 
@@ -40,29 +36,22 @@ class UserLogin(Resource):
 
         access_token = create_token(current_user)
 
-        return {
-            'message': 'Logged in as {}'.format(current_user.username),
-            'access_token': access_token,
-        }
+        return {'access_token': access_token}
 
 
-class UserLogout(Resource):
-    @jwt_required
-    @staticmethod
-    def post():
+class UserLogout(AuthenticatedResource):
+    def post(self):
         jti = get_raw_jwt()['jti']
 
         token = Token.find_by_jti(jti)
         token.revoked = True
         token.save()
 
-        return {'message': 'Access token has been revoked'}
+        return no_content()
 
 
-class SecretResource(Resource):
-    @jwt_required
-    @staticmethod
-    def get():
+class SecretResource(AuthenticatedResource):
+    def get(self):
         return {'answer': 42}
 
 
