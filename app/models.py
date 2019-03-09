@@ -2,7 +2,7 @@ import datetime
 
 from passlib.hash import pbkdf2_sha256 as sha256
 
-from app import db
+from . import db
 
 
 class User(db.Model):

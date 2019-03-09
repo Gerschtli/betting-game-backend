@@ -3,8 +3,8 @@ from flask_jwt_extended import get_raw_jwt, jwt_required
 from flask_restful import Api, Resource, reqparse
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.mod_auth.models import Token, User
-from app.mod_auth.util import create_token
+from ..models import Token, User
+from .util import create_token
 
 mod_auth = Blueprint('auth', __name__, url_prefix='/auth')
 

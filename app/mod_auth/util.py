@@ -2,7 +2,7 @@ import datetime
 
 from flask_jwt_extended import create_access_token, decode_token
 
-from app.mod_auth.models import Token
+from ..models import Token
 
 
 def _epoch_utc_to_datetime(epoch_utc):

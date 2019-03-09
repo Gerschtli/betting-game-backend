@@ -21,14 +21,14 @@ def not_found(error):
 
 @jwt.token_in_blacklist_loader
 def check_if_token_in_blacklist(decrypted_token):
-    from app.mod_auth.models import Token
+    from .models import Token
 
     jti = decrypted_token['jti']
     return Token.is_jti_blacklisted(jti)
 
 
 def register_blueprints(app):
-    from app.mod_auth.resources import mod_auth as auth_module
+    from .mod_auth.resources import mod_auth as auth_module
 
     app.register_blueprint(auth_module)
 
