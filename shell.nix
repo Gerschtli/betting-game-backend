@@ -10,7 +10,6 @@ with import <nixpkgs> { };
       git-crypt
       isort
       mypy
-      pylint
       python-language-server
     ]);
 
