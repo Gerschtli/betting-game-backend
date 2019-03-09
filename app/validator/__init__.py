@@ -1,12 +1,14 @@
 from functools import wraps
+from typing import Any, Dict
 
 import jsonschema
 from flask import request
 
 from ..errors import InputValidationError, SchemaValidationError
+from .matcher import Matcher
 
 
-def validate_input(schema):
+def validate_input(schema: Dict[str, Matcher]):
     def wrapper(fn):
         @wraps(fn)
         def decorated(*args, **kwargs):
@@ -26,7 +28,7 @@ def validate_input(schema):
     return wrapper
 
 
-def validate_schema(schema):
+def validate_schema(schema: Dict[str, Any]):
     def wrapper(fn):
         @wraps(fn)
         def decorated(*args, **kwargs):

@@ -1,27 +1,28 @@
 from abc import ABC, abstractmethod
+from typing import Any, Dict, List, Optional
 
 from ..models import User
 
 
-def _error(type, path, options=None):
-    dict = {'type': type, 'path': path}
+def _error(type: str, path: str, options: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    error: Dict[str, Any] = {'type': type, 'path': path}
     if options is not None:
-        dict['options'] = options
+        error['options'] = options
 
-    return dict
+    return error
 
 
 class Matcher(ABC):
     @abstractmethod
-    def validate(self, data, path):
+    def validate(self, data: Any, path: str) -> List[Dict[str, Any]]:
         pass
 
 
 class And(Matcher):
-    def __init__(self, *matchers):
+    def __init__(self, *matchers: Matcher) -> None:
         self._matchers = matchers
 
-    def validate(self, data, path):
+    def validate(self, data: Any, path: str) -> List[Dict[str, Any]]:
         errors = []
         for matcher in self._matchers:
             errors.extend(matcher.validate(data, path))
@@ -30,10 +31,10 @@ class And(Matcher):
 
 
 class MinLength(Matcher):
-    def __init__(self, min_length):
+    def __init__(self, min_length: int) -> None:
         self._min_length = min_length
 
-    def validate(self, data, path):
+    def validate(self, data: Any, path: str) -> List[Dict[str, Any]]:
         if len(data) >= self._min_length:
             return []
 
@@ -41,7 +42,7 @@ class MinLength(Matcher):
 
 
 class NotBlank(Matcher):
-    def validate(self, data, path):
+    def validate(self, data: Any, path: str) -> List[Dict[str, Any]]:
         if data:
             return []
 
@@ -49,7 +50,7 @@ class NotBlank(Matcher):
 
 
 class UniqueUsername(Matcher):
-    def validate(self, data, path):
+    def validate(self, data: Any, path: str) -> List[Dict[str, Any]]:
         if not User.find_by_username(data):
             return []
 
