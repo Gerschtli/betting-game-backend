@@ -14,13 +14,19 @@ api = Api(module)
 class Users(Resource):
     @validate_schema(schemas.USER)
     @validate_input({
-        'username': matcher.And(matcher.NotBlank(), matcher.UniqueUsername()),
+        'username': matcher.And(
+            matcher.NotBlank(),
+            matcher.UniqueUsername(),
+        ),
         'password': matcher.MinLength(6),
     })
     def post(self) -> Response:
         data = request.get_json()
 
-        new_user = User(username=data['username'], password=User.generate_hash(data['password']))
+        new_user = User(
+            username=data['username'],
+            password=User.generate_hash(data['password']),
+        )
         new_user.save()
 
         return no_content()

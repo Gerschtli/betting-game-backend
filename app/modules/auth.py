@@ -15,34 +15,6 @@ module = Blueprint('auth', __name__, url_prefix='/auth')
 api = Api(module)
 
 
-def _epoch_utc_to_datetime(epoch_utc: int) -> datetime.datetime:
-    return datetime.datetime.fromtimestamp(epoch_utc)
-
-
-def _add_token_to_database(encoded_token: str) -> None:
-    decoded_token = decode_token(encoded_token)
-
-    jti = decoded_token['jti']
-    user_id = decoded_token['identity']
-    expires = _epoch_utc_to_datetime(decoded_token['exp'])
-    revoked = False
-
-    token = Token(
-        jti=jti,
-        user_id=user_id,
-        expires=expires,
-        revoked=revoked,
-    )
-    token.save()
-
-
-def _create_token(user: User) -> str:
-    access_token = create_access_token(identity=user.id)
-    _add_token_to_database(access_token)
-
-    return access_token
-
-
 @api.resource('/login')
 class Login(Resource):
     @validate_schema(schemas.USER)
@@ -53,7 +25,16 @@ class Login(Resource):
         if not current_user or not User.verify_hash(data['password'], current_user.password):
             raise Unauthorized()
 
-        access_token = _create_token(current_user)
+        access_token = create_access_token(identity=current_user.id)
+        decoded_token = decode_token(access_token)
+
+        token = Token(
+            jti=decoded_token['jti'],
+            user_id=decoded_token['identity'],
+            expires=datetime.datetime.fromtimestamp(decoded_token['exp']),
+            revoked=False,
+        )
+        token.save()
 
         return {'access_token': access_token}
 
