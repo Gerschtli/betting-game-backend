@@ -1,14 +1,12 @@
-from typing import Any, Dict, Tuple
+from typing import Any, Dict
 
-from flask import Flask, jsonify
+from flask import Flask
 from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.exc import SQLAlchemyError
-from werkzeug.exceptions import NotFound
 
 from .config import default as default_config
-from .response import Response
+from .errors import register_error_handler
 
 app = Flask(__name__)
 app.config.from_object(default_config)  # type: ignore
@@ -17,16 +15,6 @@ app.config.from_envvar('APP_CONFIG_FILE')  # type: ignore
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
 migrate = Migrate(app, db)
-
-
-@app.errorhandler(NotFound)
-def not_found(error: NotFound) -> Tuple[Response, int]:
-    return jsonify({'message': 'Not Found'}), 404
-
-
-@app.errorhandler(SQLAlchemyError)
-def database_error(error: SQLAlchemyError) -> Tuple[Response, int]:
-    return jsonify({'message': 'Internal Server Error'}), 500
 
 
 @jwt.token_in_blacklist_loader
@@ -45,4 +33,5 @@ def register_blueprints(app: Flask) -> None:
     app.register_blueprint(users.module)
 
 
+register_error_handler(app)
 register_blueprints(app)
