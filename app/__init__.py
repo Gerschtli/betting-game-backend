@@ -37,9 +37,11 @@ def check_if_token_in_blacklist(decrypted_token: Dict[str, Any]) -> bool:
 
 
 def register_blueprints(app: Flask) -> None:
-    from .mod_auth.resources import mod_auth as auth_module
+    from .modules import auth, secret, users
 
-    app.register_blueprint(auth_module)
+    app.register_blueprint(auth.module)
+    app.register_blueprint(secret.module)
+    app.register_blueprint(users.module)
 
 
 register_blueprints(app)
