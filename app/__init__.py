@@ -5,6 +5,7 @@ from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import SQLAlchemyError
+from werkzeug.exceptions import NotFound
 
 from .config import default as default_config
 from .response import Response
@@ -18,8 +19,8 @@ jwt = JWTManager(app)
 migrate = Migrate(app, db)
 
 
-@app.errorhandler(404)
-def not_found() -> Tuple[Response, int]:
+@app.errorhandler(NotFound)
+def not_found(error: NotFound) -> Tuple[Response, int]:
     return jsonify({'message': 'Not Found'}), 404
 
 
