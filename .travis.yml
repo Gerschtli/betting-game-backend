@@ -27,6 +27,10 @@ matrix:
         - nix eval nixpkgs.python36.version
       script:
         - nix build --verbose
+      addons:
+        apt:
+          packages:
+            - libmariadbclient-dev
 
     - language: nix
       name: nix build on nixos-18.09
