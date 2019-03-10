@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Tuple
 
-from flask import jsonify, Flask
+from flask import Flask, jsonify
 from jsonschema import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.exceptions import NotFound
