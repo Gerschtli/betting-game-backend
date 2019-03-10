@@ -16,10 +16,10 @@ def _build_json_response(data: Any, code: int) -> Response:
 class InputValidationError(BadRequest):
     def __init__(self, errors: Dict[str, Any]) -> None:
         response = _build_json_response(errors, self.code)
-        super().__init__(self, response=response)
+        super().__init__(response=response)
 
 
 class SchemaValidationError(UnprocessableEntity):
     def __init__(self, errors: List[ValidationError]) -> None:
         response = _build_json_response([error.message for error in errors], self.code)
-        super().__init__(self, response=response)
+        super().__init__(response=response)
