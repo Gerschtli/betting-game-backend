@@ -64,13 +64,8 @@ export NIXOPS_DEPLOYMENT="$deployment"
 
 withNixops="nix run nixpkgs.nixops --unset PYTHONPATH --command"
 
-# Arg list trick:
-# https://stackoverflow.com/questions/3104209
-# ARGS=$(printf "%q"" " "$@")
-
 if [[ $deployment == --* ]]; then
-  ARGS=$(printf "%q"" " "$@")
-  $withNixops nixops $ARGS
+  $withNixops nixops $@
   exit $?
 elif [ "$command" == ".shell" ]; then
   nix run nixpkgs.nixops nixpkgs.bashInteractive --unset PYTHONPATH --command bash
@@ -81,6 +76,5 @@ elif [ -e "$state_file" ] && [ "$command" == "create" ]; then
   >&2 echo "You're trying to create a deployment that already exists."
   exit 1
 else
-  ARGS=$(printf "%q"" " "${@:2}")
-  $withNixops nixops $ARGS
+  $withNixops nixops ${@:2}
 fi
