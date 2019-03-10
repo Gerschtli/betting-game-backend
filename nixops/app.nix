@@ -78,7 +78,11 @@ rec {
       sha256 = "03g20i1xfg4qdlk4475pl4pp7y0h37g1fbgs5qhy678q9xb822hc";
     };
     doCheck = false;
-    buildInputs = old.buildInputs ++ [
+    checkInputs = (
+      if old ? buildInputs
+      then old.buildInputs
+      else old.checkInputs
+    ) ++ [
       ps.twisted
       (perf ps)
     ];
