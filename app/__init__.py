@@ -11,8 +11,8 @@ from .config import default as default_config
 from .response import Response
 
 app = Flask(__name__)
-app.config.from_object(default_config)
-app.config.from_envvar('APP_CONFIG_FILE')
+app.config.from_object(default_config)  # type: ignore
+app.config.from_envvar('APP_CONFIG_FILE')  # type: ignore
 
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
