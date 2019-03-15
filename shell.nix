@@ -1,4 +1,4 @@
-with import <nixpkgs> { };
+with import ./nixops/nixpkgs.nix;
 
 let
   mypy_extensions_ = python36Packages.buildPythonPackage rec {

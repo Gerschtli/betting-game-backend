@@ -18,7 +18,7 @@ in
       {
         systemd.services.flask-server =
           let
-            package = import ../. { inherit pkgs; };
+            package = import ../.;
             python = pkgs.python36.withPackages (ps:
               [ package ps.gunicorn ] ++ app.libraries ps
             );

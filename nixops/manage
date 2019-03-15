@@ -56,7 +56,7 @@ deployment="$1"
 command="$2"
 state_file="$here/${deployment}.nixops"
 
-nixpkgs_snapshot="https://releases.nixos.org/nixos/18.09/nixos-18.09.2132.109a28ab954/nixexprs.tar.xz"
+source "$here/nixpkgs-version.sh"
 
 export NIX_PATH=nixpkgs="$nixpkgs_snapshot":"$repo_root":.
 export NIXOPS_STATE="$state_file"
