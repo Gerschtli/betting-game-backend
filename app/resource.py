@@ -1,5 +1,9 @@
+import flask_restful
 from flask_jwt_extended import jwt_required
-from flask_restful import Resource
+
+
+class Resource(flask_restful.Resource):  # type: ignore
+    pass
 
 
 class AuthenticatedResource(Resource):
