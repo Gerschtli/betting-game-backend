@@ -29,7 +29,7 @@ def register_error_handler(app: Flask) -> None:
 
     @app.errorhandler(SchemaValidationError)
     def schema_validation_error(error: SchemaValidationError) -> Tuple[Response, int]:
-        return jsonify(error.errors), 422
+        return jsonify([err.message for err in error.errors]), 422
 
     @app.errorhandler(SQLAlchemyError)
     def database_error(error: SQLAlchemyError) -> Tuple[Response, int]:
