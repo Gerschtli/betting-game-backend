@@ -101,6 +101,7 @@ rec {
     ps.flask-restful
     ps.mysqlclient
     ps.passlib
+    ps.wrapt
     (flask-jwt-extended ps)
     (jsonschema ps)
   ];
