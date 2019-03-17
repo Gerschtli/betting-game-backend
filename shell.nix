@@ -44,7 +44,7 @@ let
   });
 in
 
-(import ./. { }).overrideDerivation (old: {
+(import ./.).overrideDerivation (old: {
   name = old.pname;
 
   buildInputs = old.buildInputs
