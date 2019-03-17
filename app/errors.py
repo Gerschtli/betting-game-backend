@@ -9,7 +9,7 @@ from .response import Response
 
 
 class InputValidationError(Exception):
-    def __init__(self, errors: Dict[str, Any]) -> None:
+    def __init__(self, errors: List[Dict[str, Any]]) -> None:
         self.errors = errors
 
 

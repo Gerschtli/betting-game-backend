@@ -3,25 +3,34 @@ from jsonschema import ValidationError
 from app.errors import InputValidationError, SchemaValidationError
 
 
-def test_input_validation_error() -> None:
-    errors = {
-        'abc': 'xy',
-        'de': 1,
-    }
+class TestInputValidationError(object):
+    def test_init(self) -> None:
+        errors = [{
+            'abc': 'xy',
+            'de': 1,
+        }, {
+            'abc': '11',
+            'de': 12,
+        }]
 
-    error = InputValidationError(errors)
+        error = InputValidationError(errors)
 
-    assert isinstance(error, Exception)
-    assert errors == error.errors
+        assert errors == error.errors
+
+    def test_subclass(self) -> None:
+        assert issubclass(InputValidationError, Exception)
 
 
-def test_schema_validation_error() -> None:
-    errors = [
-        ValidationError("a"),
-        ValidationError("b"),
-    ]
+class TestSchemaValidationError(object):
+    def test_init(self) -> None:
+        errors = [
+            ValidationError("a"),
+            ValidationError("b"),
+        ]
 
-    error = SchemaValidationError(errors)
+        error = SchemaValidationError(errors)
 
-    assert isinstance(error, Exception)
-    assert errors == error.errors
+        assert errors == error.errors
+
+    def test_subclass(self) -> None:
+        assert issubclass(SchemaValidationError, Exception)
