@@ -1,5 +1,5 @@
 from functools import wraps
-from typing import Any, Dict
+from typing import Any, Callable, Dict, TypeVar
 
 import jsonschema
 from flask import request
@@ -7,11 +7,13 @@ from flask import request
 from ..errors import InputValidationError, SchemaValidationError
 from .matcher import Matcher
 
+RT = TypeVar('RT')
 
-def validate_input(schema: Dict[str, Matcher]):
-    def wrapper(fn):
+
+def validate_input(schema: Dict[str, Matcher]) -> Callable[[Callable[..., RT]], Callable[..., RT]]:
+    def wrapper(fn: Callable[..., RT]) -> Callable[..., RT]:
         @wraps(fn)
-        def decorated(*args, **kwargs):
+        def decorated(*args: Any, **kwargs: Any) -> RT:
             errors = []
             data = request.get_json()
 
@@ -28,17 +30,18 @@ def validate_input(schema: Dict[str, Matcher]):
     return wrapper
 
 
-def validate_schema(schema: Dict[str, Any]):
-    def wrapper(fn):
-        @wraps(fn)
-        def decorated(*args, **kwargs):
-            schema["$schema"] = "http://json-schema.org/draft-07/schema#"
-            schema["additionalProperties"] = False
+def validate_schema(schema: Dict[str, Any]) -> Callable[[Callable[..., RT]], Callable[..., RT]]:
+    schema["$schema"] = "http://json-schema.org/draft-07/schema#"
+    schema["additionalProperties"] = False
 
-            validator = jsonschema.validators.Draft7Validator(schema)
+    validator = jsonschema.validators.Draft7Validator(schema)
+
+    def wrapper(fn: Callable[..., RT]) -> Callable[..., RT]:
+        @wraps(fn)
+        def decorated(*args: Any, **kwargs: Any) -> RT:
             errors = list(validator.iter_errors(request.get_json()))
 
-            if len(errors) > 0:
+            if errors:
                 raise SchemaValidationError(errors)
 
             return fn(*args, **kwargs)
