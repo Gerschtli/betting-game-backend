@@ -20,7 +20,8 @@ class Users(Resource):
         ),
         'password': matcher.MinLength(6),
     })
-    def post(self) -> Response:
+    @staticmethod
+    def post() -> Response:
         data = request.get_json()
 
         new_user = User(

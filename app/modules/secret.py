@@ -11,5 +11,6 @@ api = Api(module)
 
 @api.resource('')
 class SecretResource(AuthenticatedResource):
-    def get(self) -> Dict[str, int]:
+    @staticmethod
+    def get() -> Dict[str, int]:
         return {'answer': 42}

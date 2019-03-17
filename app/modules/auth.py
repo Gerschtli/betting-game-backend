@@ -18,7 +18,8 @@ api = Api(module)
 @api.resource('/login')
 class Login(Resource):
     @validate_schema(schemas.USER)
-    def post(self) -> Dict[str, str]:
+    @staticmethod
+    def post() -> Dict[str, str]:
         data = request.get_json()
         current_user = User.find_by_username(data['username'])
 
@@ -41,7 +42,8 @@ class Login(Resource):
 
 @api.resource('/logout')
 class Logout(AuthenticatedResource):
-    def post(self) -> Response:
+    @staticmethod
+    def post() -> Response:
         jti = get_raw_jwt()['jti']
 
         token = Token.find_by_jti(jti)
