@@ -41,10 +41,10 @@ class Token(db.Model, _SaveMixin):  # type: ignore
     revoked = db.Column(db.Boolean, nullable=False)
 
     @classmethod
+    def find_by_jti(cls, jti: str) -> 'Token':
+        return cls.query.filter_by(jti=jti).first()
+
+    @classmethod
     def is_jti_blacklisted(cls, jti: str) -> bool:
         query = cls.query.filter_by(jti=jti, revoked=True).first()
         return bool(query)
-
-    @classmethod
-    def find_by_jti(cls, jti: str) -> 'Token':
-        return cls.query.filter_by(jti=jti).first()
