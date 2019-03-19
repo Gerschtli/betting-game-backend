@@ -1,9 +1,10 @@
+import copy
 from typing import Any, Callable, Dict, List, TypeVar
 
-import jsonschema
 import wrapt
-from flask import request
+from jsonschema import validators
 
+from .. import request
 from ..errors import InputValidationError, SchemaValidationError
 from .matcher import Matcher
 
@@ -29,10 +30,11 @@ def validate_input(schema: Dict[str, Matcher]) -> Callable[[Callable[..., RT]], 
 
 
 def validate_schema(schema: Dict[str, Any]) -> Callable[[Callable[..., RT]], Callable[..., RT]]:
-    schema['$schema'] = 'http://json-schema.org/draft-07/schema#'
-    schema['additionalProperties'] = False
+    schema_cloned = copy.deepcopy(schema)
+    schema_cloned['$schema'] = 'http://json-schema.org/draft-07/schema#'
+    schema_cloned['additionalProperties'] = False
 
-    validator = jsonschema.validators.Draft7Validator(schema)
+    validator = validators.Draft7Validator(schema_cloned)
 
     @wrapt.decorator
     def wrapper(wrapped: Callable[..., RT], instance: Any, args: List[Any],

@@ -34,7 +34,7 @@ class MinLength(Matcher):
     def __init__(self, min_length: int) -> None:
         self._min_length = min_length
 
-    def validate(self, data: Any, path: str) -> List[Dict[str, Any]]:
+    def validate(self, data: str, path: str) -> List[Dict[str, Any]]:
         if len(data) >= self._min_length:
             return []
 
@@ -42,7 +42,7 @@ class MinLength(Matcher):
 
 
 class NotBlank(Matcher):
-    def validate(self, data: Any, path: str) -> List[Dict[str, Any]]:
+    def validate(self, data: str, path: str) -> List[Dict[str, Any]]:
         if data:
             return []
 
@@ -50,7 +50,7 @@ class NotBlank(Matcher):
 
 
 class UniqueUsername(Matcher):
-    def validate(self, data: Any, path: str) -> List[Dict[str, Any]]:
+    def validate(self, data: str, path: str) -> List[Dict[str, Any]]:
         if not User.find_by_username(data):
             return []
 
