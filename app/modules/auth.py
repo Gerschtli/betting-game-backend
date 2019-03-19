@@ -1,11 +1,12 @@
 import datetime
 from typing import Dict
 
-from flask import Blueprint, request
+from flask import Blueprint
 from flask_jwt_extended import create_access_token, decode_token, get_raw_jwt
 from flask_restful import Api
 from werkzeug.exceptions import Unauthorized
 
+from .. import request
 from ..models import Token, User
 from ..resource import AuthenticatedResource, Resource
 from ..response import Response, no_content

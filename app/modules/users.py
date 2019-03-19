@@ -1,6 +1,7 @@
-from flask import Blueprint, request
+from flask import Blueprint
 from flask_restful import Api
 
+from .. import request
 from ..models import User
 from ..resource import Resource
 from ..response import Response, no_content
