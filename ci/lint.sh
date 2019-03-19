@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -xe
 
-pycodestyle                    app tests
-isort --check-only --recursive app tests
-pyflakes                       app tests
-flake8                         app tests
-mypy                           app tests
+pycodestyle                    app migrations/versions tests
+isort --check-only --recursive app migrations/versions tests
+pyflakes                       app migrations/versions tests
+flake8                         app migrations/versions tests
+mypy                           app migrations/versions tests
