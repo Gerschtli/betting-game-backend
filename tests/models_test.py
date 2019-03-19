@@ -37,14 +37,14 @@ class TestUser(object):
 
         helper_column(
             User.__table__.columns.id,
-            "id",
+            'id',
             db.Integer,
             primary_key=True,
             nullable=False,
         )
         helper_column(
             User.__table__.columns.username,
-            "username",
+            'username',
             db.String,
             nullable=False,
             unique=True,
@@ -52,7 +52,7 @@ class TestUser(object):
         )
         helper_column(
             User.__table__.columns.password,
-            "password",
+            'password',
             db.String,
             nullable=False,
             string_length=255,
@@ -66,22 +66,22 @@ class TestUser(object):
         first = filter_by.return_value.first
         first.return_value = expected
 
-        result = User.find_by_username("name-xyz")
+        result = User.find_by_username('name-xyz')
 
-        filter_by.assert_called_once_with(username="name-xyz")
+        filter_by.assert_called_once_with(username='name-xyz')
         first.assert_called_once_with()
 
         assert result == expected
 
-    @patch("passlib.hash.pbkdf2_sha256.hash")
+    @patch('passlib.hash.pbkdf2_sha256.hash')
     def test_generate_hash(self, mock_hash: Mock) -> None:
-        mock_hash.return_value = "haashi"
+        mock_hash.return_value = 'haashi'
 
-        result = User.generate_hash("gesundheit")
+        result = User.generate_hash('gesundheit')
 
-        mock_hash.assert_called_once_with("gesundheit")
+        mock_hash.assert_called_once_with('gesundheit')
 
-        assert result == "haashi"
+        assert result == 'haashi'
 
     def test_save(self) -> None:
         db.session.add = Mock()
@@ -93,13 +93,13 @@ class TestUser(object):
         db.session.add.assert_called_once_with(user)
         db.session.commit.assert_called_once_with()
 
-    @patch("passlib.hash.pbkdf2_sha256.verify")
+    @patch('passlib.hash.pbkdf2_sha256.verify')
     def test_verify_hash(self, mock_hash: Mock) -> None:
         mock_hash.return_value = True
 
-        result = User.verify_hash("gesundheit", "haashi")
+        result = User.verify_hash('gesundheit', 'haashi')
 
-        mock_hash.assert_called_once_with("gesundheit", "haashi")
+        mock_hash.assert_called_once_with('gesundheit', 'haashi')
 
         assert result
 
@@ -114,33 +114,33 @@ class TestToken(object):
 
         helper_column(
             Token.__table__.columns.id,
-            "id",
+            'id',
             db.Integer,
             primary_key=True,
             nullable=False,
         )
         helper_column(
             Token.__table__.columns.jti,
-            "jti",
+            'jti',
             db.String,
             nullable=False,
             string_length=255,
         )
         helper_column(
             Token.__table__.columns.user_id,
-            "user_id",
+            'user_id',
             db.Integer,
             nullable=False,
         )
         helper_column(
             Token.__table__.columns.expires,
-            "expires",
+            'expires',
             db.DateTime,
             nullable=False,
         )
         helper_column(
             Token.__table__.columns.revoked,
-            "revoked",
+            'revoked',
             db.Boolean,
             nullable=False,
         )
@@ -156,15 +156,15 @@ class TestToken(object):
         first = filter_by.return_value.first
         first.return_value = expected
 
-        result = Token.find_by_jti("name-xyz")
+        result = Token.find_by_jti('name-xyz')
 
-        filter_by.assert_called_once_with(jti="name-xyz")
+        filter_by.assert_called_once_with(jti='name-xyz')
         first.assert_called_once_with()
 
         assert result == expected
 
     @pytest.mark.parametrize(
-        "return_value,expected",
+        'return_value,expected',
         [
             (Token(id=123), True),
             (None, False),
@@ -177,9 +177,9 @@ class TestToken(object):
         first = filter_by.return_value.first
         first.return_value = return_value
 
-        result = Token.is_jti_blacklisted("name-xyz")
+        result = Token.is_jti_blacklisted('name-xyz')
 
-        filter_by.assert_called_once_with(jti="name-xyz", revoked=True)
+        filter_by.assert_called_once_with(jti='name-xyz', revoked=True)
         first.assert_called_once_with()
 
         assert result == expected

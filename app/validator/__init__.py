@@ -29,8 +29,8 @@ def validate_input(schema: Dict[str, Matcher]) -> Callable[[Callable[..., RT]], 
 
 
 def validate_schema(schema: Dict[str, Any]) -> Callable[[Callable[..., RT]], Callable[..., RT]]:
-    schema["$schema"] = "http://json-schema.org/draft-07/schema#"
-    schema["additionalProperties"] = False
+    schema['$schema'] = 'http://json-schema.org/draft-07/schema#'
+    schema['additionalProperties'] = False
 
     validator = jsonschema.validators.Draft7Validator(schema)
 

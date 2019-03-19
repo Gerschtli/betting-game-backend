@@ -30,8 +30,8 @@ class TestInputValidationError(object):
 class TestSchemaValidationError(object):
     def test_init(self) -> None:
         errors = [
-            ValidationError("a"),
-            ValidationError("b"),
+            ValidationError('a'),
+            ValidationError('b'),
         ]
 
         error = SchemaValidationError(errors)
@@ -64,8 +64,8 @@ class TestRegisterErrorHandler(object):
     def test_schema_validation_error(self) -> None:
         response = self._get_response(
             SchemaValidationError([
-                ValidationError("msg1"),
-                ValidationError("msg2"),
+                ValidationError('msg1'),
+                ValidationError('msg2'),
             ]))
 
         assert response.data == b'["msg1","msg2"]\n'
