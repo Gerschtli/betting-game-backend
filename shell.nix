@@ -42,6 +42,18 @@ let
       typed-ast_
     ];
   });
+
+  flake8-quotes = python36Packages.buildPythonPackage rec {
+    pname = "flake8-quotes";
+    version = "1.0.0";
+
+    src = python36Packages.fetchPypi {
+      inherit pname version;
+      sha256 = "09ib440hrf5bbsmdbqzbcpkkqqnqdwkaawbqz93bbwxwifnjg4gx";
+    };
+
+    propagatedBuildInputs = [ python36Packages.flake8 ];
+  };
 in
 
 (import ./.).overrideDerivation (old: {
@@ -51,6 +63,7 @@ in
     ++ (with python36Packages; [
       coverage
       flake8
+      flake8-quotes
       git-crypt
       isort
       mypy_
