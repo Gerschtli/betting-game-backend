@@ -43,27 +43,27 @@ class TestSchemaValidationError(object):
 
 
 class TestRegisterErrorHandler(object):
-    def test_database_error(self) -> None:
-        response = self._get_response(SQLAlchemyError())
+    def test_database_error(self, app: Flask) -> None:
+        response = self._get_response(app, SQLAlchemyError())
 
         assert response.data == b'{"message":"Internal Server Error"}\n'
         assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
 
-    def test_input_validation_error(self) -> None:
-        response = self._get_response(InputValidationError([{'abc': 'def'}]))
+    def test_input_validation_error(self, app: Flask) -> None:
+        response = self._get_response(app, InputValidationError([{'abc': 'def'}]))
 
         assert response.data == b'[{"abc":"def"}]\n'
         assert response.status_code == HTTPStatus.BAD_REQUEST
 
-    def test_not_found(self) -> None:
-        response = self._get_response(NotFound())
+    def test_not_found(self, app: Flask) -> None:
+        response = self._get_response(app, NotFound())
 
         assert response.data == b'{"message":"Not Found"}\n'
         assert response.status_code == HTTPStatus.NOT_FOUND
 
-    def test_schema_validation_error(self) -> None:
+    def test_schema_validation_error(self, app: Flask) -> None:
         response = self._get_response(
-            SchemaValidationError([
+            app, SchemaValidationError([
                 ValidationError('msg1'),
                 ValidationError('msg2'),
             ]))
@@ -71,9 +71,7 @@ class TestRegisterErrorHandler(object):
         assert response.data == b'["msg1","msg2"]\n'
         assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
-    def _get_response(self, exception: Exception) -> Response:
-        app = Flask(__name__)
-        app.config['TESTING'] = True
+    def _get_response(self, app: Flask, exception: Exception) -> Response:
         register_error_handler(app)
 
         @app.route('/')
