@@ -14,7 +14,7 @@ def _error(type: str, path: str, options: Optional[Dict[str, Any]] = None) -> Di
 
 class Matcher(ABC):
     @abstractmethod
-    def validate(self, data: Any, path: str) -> List[Dict[str, Any]]:
+    def validate(self, data: Any, path: str) -> List[Dict[str, Any]]:  # pragma: no cover
         pass
 
 
