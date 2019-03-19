@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from typing import Any, Dict, List, Tuple
 
 from flask import Flask, jsonify
@@ -19,18 +20,18 @@ class SchemaValidationError(Exception):
 
 
 def register_error_handler(app: Flask) -> None:
+    @app.errorhandler(SQLAlchemyError)
+    def database_error(error: SQLAlchemyError) -> Tuple[Response, int]:
+        return jsonify({'message': 'Internal Server Error'}), HTTPStatus.INTERNAL_SERVER_ERROR
+
     @app.errorhandler(InputValidationError)
     def input_validation_error(error: InputValidationError) -> Tuple[Response, int]:
-        return jsonify(error.errors), 400
+        return jsonify(error.errors), HTTPStatus.BAD_REQUEST
 
     @app.errorhandler(NotFound)
     def not_found(error: NotFound) -> Tuple[Response, int]:
-        return jsonify({'message': 'Not Found'}), 404
+        return jsonify({'message': 'Not Found'}), HTTPStatus.NOT_FOUND
 
     @app.errorhandler(SchemaValidationError)
     def schema_validation_error(error: SchemaValidationError) -> Tuple[Response, int]:
-        return jsonify([err.message for err in error.errors]), 422
-
-    @app.errorhandler(SQLAlchemyError)
-    def database_error(error: SQLAlchemyError) -> Tuple[Response, int]:
-        return jsonify({'message': 'Internal Server Error'}), 500
+        return jsonify([err.message for err in error.errors]), HTTPStatus.UNPROCESSABLE_ENTITY
