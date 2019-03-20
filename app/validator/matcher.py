@@ -20,11 +20,11 @@ class Matcher(ABC):
 
 class And(Matcher):
     def __init__(self, *matchers: Matcher) -> None:
-        self._matchers = matchers
+        self.matchers = matchers
 
     def validate(self, data: Any, path: str) -> List[Dict[str, Any]]:
         errors = []
-        for matcher in self._matchers:
+        for matcher in self.matchers:
             errors.extend(matcher.validate(data, path))
 
         return errors
@@ -32,13 +32,13 @@ class And(Matcher):
 
 class MinLength(Matcher):
     def __init__(self, min_length: int) -> None:
-        self._min_length = min_length
+        self.min_length = min_length
 
     def validate(self, data: str, path: str) -> List[Dict[str, Any]]:
-        if len(data) >= self._min_length:
+        if len(data) >= self.min_length:
             return []
 
-        return [_error('min_length', path, {'value': self._min_length})]
+        return [_error('min_length', path, {'value': self.min_length})]
 
 
 class NotBlank(Matcher):
