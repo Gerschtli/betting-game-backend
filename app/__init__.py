@@ -1,31 +1,28 @@
 import logging
 import sys
 
-from flask import Flask
-from flask_migrate import Migrate
+import flask
+import flask_migrate
 
+from . import errors, jwt, models, modules
 from .config import default as default_config
-from .errors import register_error_handler
-from .jwt import jwt
-from .models import db
-from .modules import register_blueprints
 
 
-def create_app() -> Flask:
-    app = Flask(__name__)
+def create_app() -> flask.Flask:
+    app = flask.Flask(__name__)
     app.config.from_object(default_config)  # type: ignore
     app.config.from_envvar('APP_CONFIG_FILE')  # type: ignore
 
-    db.init_app(app)
-    jwt.init_app(app)
-    Migrate(app, db)
+    models.db.init_app(app)
+    jwt.jwt.init_app(app)
+    flask_migrate.Migrate(app, models.db)
 
     logging.basicConfig(
         level=logging.DEBUG,
         stream=sys.stdout,
     )
 
-    register_error_handler(app)
-    register_blueprints(app)
+    errors.register_error_handler(app)
+    modules.register_blueprints(app)
 
     return app
