@@ -73,11 +73,9 @@ def test_validate_input_with_error(mock_get_json: Mock) -> None:
 
 
 @patch('app.request.get_json')
-def test_validate_schema(mock_get_json: Mock) -> None:
+@patch('jsonschema.validators.Draft7Validator')
+def test_validate_schema(mock_validator: Mock, mock_get_json: Mock) -> None:
     called = False
-
-    mock_validator = Mock('jsonschema.validators.Draft7Validator', autospec=True)
-    validators.Draft7Validator = mock_validator
 
     validator_instance = mock_validator.return_value
     validator_instance.iter_errors = Mock(return_value=iter([]))
@@ -101,15 +99,13 @@ def test_validate_schema(mock_get_json: Mock) -> None:
 
         return 6
 
+    assert function('string', arg2=23) == 6
+
     mock_validator.assert_called_once_with({
-        '$schema': 'http://json-schema.org/draft-07/schema#',
-        'additionalProperties': False,
         'properties': {
             'name': 'value',
         }
     })
-
-    assert function('string', arg2=23) == 6
 
     mock_get_json.assert_called_once_with()
     validator_instance.iter_errors.assert_called_once_with({
@@ -119,11 +115,9 @@ def test_validate_schema(mock_get_json: Mock) -> None:
 
 
 @patch('app.request.get_json')
-def test_validate_schema_with_error(mock_get_json: Mock) -> None:
+@patch('jsonschema.validators.Draft7Validator')
+def test_validate_schema_with_error(mock_validator: Mock, mock_get_json: Mock) -> None:
     error = ValidationError('msg')
-
-    mock_validator = Mock('jsonschema.validators.Draft7Validator', autospec=True)
-    validators.Draft7Validator = mock_validator
 
     validator_instance = mock_validator.return_value
     validator_instance.iter_errors = Mock(return_value=iter([error]))
@@ -141,14 +135,6 @@ def test_validate_schema_with_error(mock_get_json: Mock) -> None:
     def function() -> None:
         pass
 
-    mock_validator.assert_called_once_with({
-        '$schema': 'http://json-schema.org/draft-07/schema#',
-        'additionalProperties': False,
-        'properties': {
-            'name': 'value',
-        }
-    })
-
     try:
         function()
     except Exception as e:
@@ -156,6 +142,12 @@ def test_validate_schema_with_error(mock_get_json: Mock) -> None:
         assert e.errors == [error]
     else:
         assert False, 'should throw exception'
+
+    mock_validator.assert_called_once_with({
+        'properties': {
+            'name': 'value',
+        }
+    })
 
     mock_get_json.assert_called_once_with()
     validator_instance.iter_errors.assert_called_once_with({
