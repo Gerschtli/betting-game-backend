@@ -1,5 +1,7 @@
 import datetime
 
+PROPAGATE_EXCEPTIONS = True
+
 JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(hours=8)
 JWT_BLACKLIST_ENABLED = True
 
