@@ -39,7 +39,7 @@ in
                 ExecStart = ''
                   ${python}/bin/python -m gunicorn.app.wsgiapp \
                     --bind 0.0.0.0:${toString app.port} --workers 4 \
-                    --chdir ${package}/${python.sitePackages} app:app
+                    --chdir ${package}/${python.sitePackages} app:create_app()
                 '';
                 User = app.user;
                 Restart = "always";
