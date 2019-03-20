@@ -29,7 +29,7 @@ in
               wantedBy = [ "multi-user.target" ];
               environment = {
                 APP_CONFIG_FILE = "${package}/${python.sitePackages}/app/config/prod.py";
-                FLASK_APP = "${package}/${python.sitePackages}/app";
+                FLASK_APP = "${package}/${python.sitePackages}/app:create_app()";
               };
               serviceConfig = {
                 ExecStartPre = ''

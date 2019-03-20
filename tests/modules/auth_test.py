@@ -23,14 +23,14 @@ class TestLogin(object):
 
     @patch('flask_jwt_extended.decode_token')
     @patch('flask_jwt_extended.create_access_token')
-    @patch('app.models.Token', autospec=True)
-    @patch('app.models.User', autospec=True)
+    @patch('app.models.Token')
+    @patch('app.models.User')
     @patch('app.validator._validate_schema')
     def test_post(self, mock_validate_schema: Mock, mock_user: Mock, mock_token: Mock,
                   mock_create_token: Mock, mock_decode_token: Mock, app: Flask) -> None:
         mock_validate_schema.side_effect = validator_call_through
 
-        current_user = Mock('app.models.User', autospec=True)
+        current_user = Mock('app.models.User')
         current_user.id = 123
         current_user.password = 'hash'
 
@@ -71,13 +71,13 @@ class TestLogin(object):
         assert response.data == b'{"access_token": "access_token"}\n'
         assert response.status_code == HTTPStatus.OK
 
-    @patch('app.models.User', autospec=True)
+    @patch('app.models.User')
     @patch('app.validator._validate_schema')
     def test_post_with_wrong_password(self, mock_validate_schema: Mock, mock_user: Mock,
                                       app: Flask) -> None:
         mock_validate_schema.side_effect = validator_call_through
 
-        current_user = Mock('app.models.User', autospec=True)
+        current_user = Mock('app.models.User')
         current_user.password = 'hash'
 
         mock_user.find_by_username.return_value = current_user
@@ -96,7 +96,7 @@ class TestLogin(object):
 
         assert response.status_code == HTTPStatus.UNAUTHORIZED
 
-    @patch('app.models.User', autospec=True)
+    @patch('app.models.User')
     @patch('app.validator._validate_schema')
     def test_post_with_no_user(self, mock_validate_schema: Mock, mock_user: Mock,
                                app: Flask) -> None:
@@ -121,12 +121,12 @@ class TestLogout(object):
     def test_subclass(self) -> None:
         assert issubclass(auth.Logout, AuthenticatedResource)
 
-    @patch('app.models.Token', autospec=True)
+    @patch('app.models.Token')
     @patch('flask_jwt_extended.get_raw_jwt')
     def test_post(self, mock_get_jwt: Mock, mock_token: Mock, app: Flask) -> None:
         mock_get_jwt.return_value = {'jti': 'token_jti'}
 
-        token_instance = Mock('app.models.Token', autospec=True)
+        token_instance = Mock('app.models.Token')
         token_instance.revoked = False
         token_instance.save = Mock()
         mock_token.find_by_jti.return_value = token_instance

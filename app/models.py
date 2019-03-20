@@ -1,8 +1,9 @@
 import datetime
 
+from flask_sqlalchemy import SQLAlchemy
 from passlib.hash import pbkdf2_sha256 as sha256
 
-from . import db
+db = SQLAlchemy()
 
 
 class _SaveMixin(object):

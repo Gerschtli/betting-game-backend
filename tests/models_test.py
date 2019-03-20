@@ -2,12 +2,16 @@ from typing import Optional
 from unittest.mock import Mock, patch
 
 import pytest
+from flask_sqlalchemy import SQLAlchemy
 
-from app import db
-from app.models import Token, User
+from app.models import Token, User, db
 
 
-def helper_column(  # type: ignore
+def test_init() -> None:
+    assert isinstance(db, SQLAlchemy)
+
+
+def _helper_column(  # type: ignore
         column: db.Column,
         name: str,
         type_cls,
@@ -35,14 +39,14 @@ class TestUser(object):
         assert User.__tablename__ == 'user'
         assert len(User.__table__.columns) == 3
 
-        helper_column(
+        _helper_column(
             User.__table__.columns.id,
             'id',
             db.Integer,
             primary_key=True,
             nullable=False,
         )
-        helper_column(
+        _helper_column(
             User.__table__.columns.username,
             'username',
             db.String,
@@ -50,7 +54,7 @@ class TestUser(object):
             unique=True,
             string_length=255,
         )
-        helper_column(
+        _helper_column(
             User.__table__.columns.password,
             'password',
             db.String,
@@ -112,33 +116,33 @@ class TestToken(object):
         assert Token.__tablename__ == 'token'
         assert len(Token.__table__.columns) == 5
 
-        helper_column(
+        _helper_column(
             Token.__table__.columns.id,
             'id',
             db.Integer,
             primary_key=True,
             nullable=False,
         )
-        helper_column(
+        _helper_column(
             Token.__table__.columns.jti,
             'jti',
             db.String,
             nullable=False,
             string_length=255,
         )
-        helper_column(
+        _helper_column(
             Token.__table__.columns.user_id,
             'user_id',
             db.Integer,
             nullable=False,
         )
-        helper_column(
+        _helper_column(
             Token.__table__.columns.expires,
             'expires',
             db.DateTime,
             nullable=False,
         )
-        helper_column(
+        _helper_column(
             Token.__table__.columns.revoked,
             'revoked',
             db.Boolean,

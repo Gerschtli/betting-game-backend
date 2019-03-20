@@ -69,7 +69,7 @@ in
           wantedBy = [ "multi-user.target" ];
           environment = {
             APP_CONFIG_FILE = appDir + "/app/config/dev.py";
-            FLASK_APP = appDir + "/app";
+            FLASK_APP = appDir + "/app:create_app()";
             FLASK_ENV = "development";
           };
           serviceConfig =

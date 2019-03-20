@@ -20,7 +20,7 @@ class TestUsers(object):
     def test_subclass(self) -> None:
         assert issubclass(users.Users, Resource)
 
-    @patch('app.models.User', autospec=True)
+    @patch('app.models.User')
     @patch('app.validator._validate_input')
     @patch('app.validator._validate_schema')
     def test_post(self, mock_validate_schema: Mock, mock_validate_input: Mock, mock_user: Mock,
