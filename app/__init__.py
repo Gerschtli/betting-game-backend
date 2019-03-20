@@ -1,3 +1,5 @@
+import logging
+import sys
 from typing import Any, Dict
 
 from flask import Flask
@@ -15,6 +17,11 @@ app.config.from_envvar('APP_CONFIG_FILE')  # type: ignore
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
 migrate = Migrate(app, db)
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    stream=sys.stdout,
+)
 
 
 @jwt.token_in_blacklist_loader

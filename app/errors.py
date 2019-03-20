@@ -1,12 +1,14 @@
+import logging
 from http import HTTPStatus
 from typing import Any, Dict, List, Tuple
 
 from flask import Flask, jsonify
 from jsonschema import ValidationError
-from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.exceptions import NotFound
 
 from .response import Response
+
+LOGGER: logging.Logger = logging.getLogger(__name__)
 
 
 class InputValidationError(Exception):
@@ -20,8 +22,9 @@ class SchemaValidationError(Exception):
 
 
 def register_error_handler(app: Flask) -> None:
-    @app.errorhandler(SQLAlchemyError)
-    def database_error(error: SQLAlchemyError) -> Tuple[Response, int]:
+    @app.errorhandler(Exception)
+    def catch_all(error: Exception) -> Tuple[Response, int]:
+        LOGGER.exception('Uncaught exception in endpoint: %s', error)
         return jsonify({'message': 'Internal Server Error'}), HTTPStatus.INTERNAL_SERVER_ERROR
 
     @app.errorhandler(InputValidationError)

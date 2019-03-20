@@ -1,9 +1,9 @@
+import logging
 from http import HTTPStatus
-from typing import NoReturn
+from typing import Any, NoReturn
 
 from flask import Flask, Response
 from jsonschema import ValidationError
-from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.exceptions import NotFound
 
 from app.errors import InputValidationError, SchemaValidationError, register_error_handler
@@ -43,11 +43,19 @@ class TestSchemaValidationError(object):
 
 
 class TestRegisterErrorHandler(object):
-    def test_database_error(self, app: Flask) -> None:
-        response = self._get_response(app, SQLAlchemyError())
+    def test_catch_all(
+            self,
+            app: Flask,
+            caplog: Any,  # _pytest.logging.LogCaptureFixture
+    ) -> None:
+        response = self._get_response(app, Exception('error occured'))
 
         assert response.data == b'{"message":"Internal Server Error"}\n'
         assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
+
+        assert caplog.record_tuples == [
+            ('app.errors', logging.ERROR, 'Uncaught exception in endpoint: error occured'),
+        ]
 
     def test_input_validation_error(self, app: Flask) -> None:
         response = self._get_response(app, InputValidationError([{'abc': 'def'}]))
