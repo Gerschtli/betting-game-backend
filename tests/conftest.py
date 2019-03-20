@@ -1,11 +1,5 @@
-import os
-import time
-
 import pytest
 from flask import Flask
-
-os.environ['TZ'] = 'Europe/Berlin'
-time.tzset()
 
 
 @pytest.fixture

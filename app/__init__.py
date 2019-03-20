@@ -1,7 +1,5 @@
 import logging
-import os
 import sys
-import time
 
 from flask import Flask
 from flask_migrate import Migrate
@@ -14,9 +12,6 @@ from .modules import register_blueprints
 
 
 def create_app() -> Flask:
-    os.environ['TZ'] = 'Europe/Berlin'
-    time.tzset()
-
     app = Flask(__name__)
     app.config.from_object(default_config)  # type: ignore
     app.config.from_envvar('APP_CONFIG_FILE')  # type: ignore

@@ -63,7 +63,7 @@ class TestLogin(object):
         mock_token.assert_called_once_with(
             jti='token_jti',
             user_id='token_identity',
-            expires=datetime.datetime(2019, 3, 20, 22, 36, 49),
+            expires=datetime.datetime.fromtimestamp(1553117809),
             revoked=False,
         )
         token_instance.save.assert_called_once_with()
