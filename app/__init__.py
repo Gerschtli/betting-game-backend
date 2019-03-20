@@ -1,5 +1,7 @@
 import logging
+import os
 import sys
+import time
 from typing import Any, Dict
 
 from flask import Flask
@@ -9,6 +11,9 @@ from flask_sqlalchemy import SQLAlchemy
 
 from .config import default as default_config
 from .errors import register_error_handler
+
+os.environ['TZ'] = 'Europe/Berlin'
+time.tzset()
 
 app = Flask(__name__)
 app.config.from_object(default_config)  # type: ignore
