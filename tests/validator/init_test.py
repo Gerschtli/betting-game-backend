@@ -1,6 +1,6 @@
 from unittest.mock import Mock, patch
 
-from jsonschema import ValidationError, validators
+from jsonschema import ValidationError
 
 from app.errors import InputValidationError, SchemaValidationError
 from app.validator import validate_input, validate_schema
