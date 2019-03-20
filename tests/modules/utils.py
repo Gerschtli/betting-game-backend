@@ -1,7 +1,20 @@
 from typing import Any, Callable, Dict, List, TypeVar
 from unittest.mock import Mock
 
+from flask import Flask
+from flask_jwt_extended import JWTManager, create_access_token
+
 RT = TypeVar('RT')
+
+
+def build_authorization_headers(app: Flask) -> Dict[str, str]:
+    app.config['JWT_SECRET_KEY'] = 'abcxyz'
+    JWTManager(app)
+
+    with app.test_request_context():
+        access_token = create_access_token('testuser')
+
+    return {'Authorization': 'Bearer {}'.format(access_token)}
 
 
 def get_validator_schema(mock: Mock) -> Dict[str, Any]:
