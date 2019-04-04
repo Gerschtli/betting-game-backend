@@ -98,6 +98,7 @@ rec {
     ps.flask
     ps.flask_migrate
     ps.flask_sqlalchemy
+    ps.flask-cors
     ps.flask-restful
     ps.mysqlclient
     ps.passlib
