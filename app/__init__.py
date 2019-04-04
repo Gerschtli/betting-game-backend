@@ -2,6 +2,7 @@ import logging
 import sys
 
 import flask
+import flask_cors
 import flask_migrate
 
 from . import errors, jwt, models, modules
@@ -15,6 +16,7 @@ def create_app() -> flask.Flask:
 
     models.db.init_app(app)
     jwt.jwt.init_app(app)
+    flask_cors.CORS(app)
     flask_migrate.Migrate(app, models.db)
 
     logging.basicConfig(
