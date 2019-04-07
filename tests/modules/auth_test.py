@@ -74,7 +74,7 @@ class TestLogin(object):
         )
         token_instance.save.assert_called_once_with()
 
-        assert response.data == b'{"access_token": "access_token"}\n'
+        assert response.data == b'{"access_token": "access_token", "id": 123}\n'
         assert response.status_code == HTTPStatus.OK
 
     @patch('app.models.User')

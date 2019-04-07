@@ -37,7 +37,10 @@ class Login(Resource):
         )
         token.save()
 
-        return {'access_token': access_token}
+        return {
+            'access_token': access_token,
+            'id': current_user.id,
+        }
 
 
 @api.resource('/logout')
