@@ -50,7 +50,13 @@ class TestLogin(object):
 
         client = app.test_client()
 
-        response = client.post('/auth/login', json={'username': 'flask', 'password': 'secret'})
+        response = client.post(  # type: ignore
+            '/auth/login',
+            json={
+                'username': 'flask',
+                'password': 'secret'
+            },
+        )
 
         assert get_validator_schema(mock_validate_schema) == schemas.USER
 
@@ -87,7 +93,13 @@ class TestLogin(object):
 
         client = app.test_client()
 
-        response = client.post('/auth/login', json={'username': 'flask', 'password': 'secret'})
+        response = client.post(  # type: ignore
+            '/auth/login',
+            json={
+                'username': 'flask',
+                'password': 'secret'
+            },
+        )
 
         assert get_validator_schema(mock_validate_schema) == schemas.USER
 
@@ -108,7 +120,13 @@ class TestLogin(object):
 
         client = app.test_client()
 
-        response = client.post('/auth/login', json={'username': 'flask', 'password': 'secret'})
+        response = client.post(  # type: ignore
+            '/auth/login',
+            json={
+                'username': 'flask',
+                'password': 'secret'
+            },
+        )
 
         assert get_validator_schema(mock_validate_schema) == schemas.USER
 
@@ -135,7 +153,10 @@ class TestLogout(object):
 
         client = app.test_client()
 
-        response = client.post('/auth/logout', headers=build_authorization_headers(app))
+        response = client.post(  # type: ignore
+            '/auth/logout',
+            headers=build_authorization_headers(app),
+        )
 
         mock_token.find_by_jti.assert_called_once_with('token_jti')
         token_instance.save.assert_called_once_with()

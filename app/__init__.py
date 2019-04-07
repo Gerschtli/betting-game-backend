@@ -11,8 +11,8 @@ from .config import default as default_config
 
 def create_app() -> flask.Flask:
     app = flask.Flask(__name__)
-    app.config.from_object(default_config)  # type: ignore
-    app.config.from_envvar('APP_CONFIG_FILE')  # type: ignore
+    app.config.from_object(default_config)
+    app.config.from_envvar('APP_CONFIG_FILE')
 
     models.db.init_app(app)
     jwt.jwt.init_app(app)

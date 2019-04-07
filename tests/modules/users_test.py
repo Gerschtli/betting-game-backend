@@ -35,7 +35,13 @@ class TestUsers(object):
 
         client = app.test_client()
 
-        response = client.post('/users', json={'username': 'flask', 'password': 'secret'})
+        response = client.post(  # type: ignore
+            '/users',
+            json={
+                'username': 'flask',
+                'password': 'secret'
+            },
+        )
 
         assert get_validator_schema(mock_validate_schema) == schemas.USER
         schema = get_validator_schema(mock_validate_input)
