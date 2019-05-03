@@ -31,83 +31,6 @@ def _helper_column(  # type: ignore
         assert column.type.length == string_length
 
 
-class TestUser(object):
-    def test_subclass(self) -> None:
-        assert issubclass(User, db.Model)
-
-    def test_properties(self) -> None:
-        assert User.__tablename__ == 'user'
-        assert len(User.__table__.columns) == 3
-
-        _helper_column(
-            User.__table__.columns.id,
-            'id',
-            db.Integer,
-            primary_key=True,
-            nullable=False,
-        )
-        _helper_column(
-            User.__table__.columns.username,
-            'username',
-            db.String,
-            nullable=False,
-            unique=True,
-            string_length=255,
-        )
-        _helper_column(
-            User.__table__.columns.password,
-            'password',
-            db.String,
-            nullable=False,
-            string_length=255,
-        )
-
-    @patch('flask_sqlalchemy._QueryProperty.__get__')
-    def test_find_by_username(self, mock_query: Mock) -> None:
-        expected = User(id=123)
-
-        filter_by = mock_query.return_value.filter_by
-        first = filter_by.return_value.first
-        first.return_value = expected
-
-        result = User.find_by_username('name-xyz')
-
-        filter_by.assert_called_once_with(username='name-xyz')
-        first.assert_called_once_with()
-
-        assert result == expected
-
-    @patch('passlib.hash.pbkdf2_sha256.hash')
-    def test_generate_hash(self, mock_hash: Mock) -> None:
-        mock_hash.return_value = 'haashi'
-
-        result = User.generate_hash('gesundheit')
-
-        mock_hash.assert_called_once_with('gesundheit')
-
-        assert result == 'haashi'
-
-    def test_save(self) -> None:
-        db.session.add = Mock()
-        db.session.commit = Mock()
-
-        user = User(id=123)
-        user.save()
-
-        db.session.add.assert_called_once_with(user)
-        db.session.commit.assert_called_once_with()
-
-    @patch('passlib.hash.pbkdf2_sha256.verify')
-    def test_verify_hash(self, mock_hash: Mock) -> None:
-        mock_hash.return_value = True
-
-        result = User.verify_hash('gesundheit', 'haashi')
-
-        mock_hash.assert_called_once_with('gesundheit', 'haashi')
-
-        assert result
-
-
 class TestToken(object):
     def test_subclass(self) -> None:
         assert issubclass(User, db.Model)
@@ -197,3 +120,80 @@ class TestToken(object):
 
         db.session.add.assert_called_once_with(token)
         db.session.commit.assert_called_once_with()
+
+
+class TestUser(object):
+    def test_subclass(self) -> None:
+        assert issubclass(User, db.Model)
+
+    def test_properties(self) -> None:
+        assert User.__tablename__ == 'user'
+        assert len(User.__table__.columns) == 3
+
+        _helper_column(
+            User.__table__.columns.id,
+            'id',
+            db.Integer,
+            primary_key=True,
+            nullable=False,
+        )
+        _helper_column(
+            User.__table__.columns.username,
+            'username',
+            db.String,
+            nullable=False,
+            unique=True,
+            string_length=255,
+        )
+        _helper_column(
+            User.__table__.columns.password,
+            'password',
+            db.String,
+            nullable=False,
+            string_length=255,
+        )
+
+    @patch('flask_sqlalchemy._QueryProperty.__get__')
+    def test_find_by_username(self, mock_query: Mock) -> None:
+        expected = User(id=123)
+
+        filter_by = mock_query.return_value.filter_by
+        first = filter_by.return_value.first
+        first.return_value = expected
+
+        result = User.find_by_username('name-xyz')
+
+        filter_by.assert_called_once_with(username='name-xyz')
+        first.assert_called_once_with()
+
+        assert result == expected
+
+    @patch('passlib.hash.pbkdf2_sha256.hash')
+    def test_generate_hash(self, mock_hash: Mock) -> None:
+        mock_hash.return_value = 'haashi'
+
+        result = User.generate_hash('gesundheit')
+
+        mock_hash.assert_called_once_with('gesundheit')
+
+        assert result == 'haashi'
+
+    def test_save(self) -> None:
+        db.session.add = Mock()
+        db.session.commit = Mock()
+
+        user = User(id=123)
+        user.save()
+
+        db.session.add.assert_called_once_with(user)
+        db.session.commit.assert_called_once_with()
+
+    @patch('passlib.hash.pbkdf2_sha256.verify')
+    def test_verify_hash(self, mock_hash: Mock) -> None:
+        mock_hash.return_value = True
+
+        result = User.verify_hash('gesundheit', 'haashi')
+
+        mock_hash.assert_called_once_with('gesundheit', 'haashi')
+
+        assert result

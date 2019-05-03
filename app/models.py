@@ -12,6 +12,25 @@ class _SaveMixin(object):
         db.session.commit()
 
 
+class Token(db.Model, _SaveMixin):  # type: ignore
+    __tablename__ = 'token'
+
+    id = db.Column(db.Integer, primary_key=True)
+    jti = db.Column(db.String(255), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
+    expires = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
+    revoked = db.Column(db.Boolean, nullable=False)
+
+    @classmethod
+    def find_by_jti(cls, jti: str) -> 'Token':
+        return cls.query.filter_by(jti=jti).first()
+
+    @classmethod
+    def is_jti_blacklisted(cls, jti: str) -> bool:
+        query = cls.query.filter_by(jti=jti, revoked=True).first()
+        return bool(query)
+
+
 class User(db.Model, _SaveMixin):  # type: ignore
     __tablename__ = 'user'
 
@@ -30,22 +49,3 @@ class User(db.Model, _SaveMixin):  # type: ignore
     @staticmethod
     def verify_hash(password: str, hash: str) -> bool:
         return sha256.verify(password, hash)
-
-
-class Token(db.Model, _SaveMixin):  # type: ignore
-    __tablename__ = 'token'
-
-    id = db.Column(db.Integer, primary_key=True)
-    jti = db.Column(db.String(255), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
-    expires = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
-    revoked = db.Column(db.Boolean, nullable=False)
-
-    @classmethod
-    def find_by_jti(cls, jti: str) -> 'Token':
-        return cls.query.filter_by(jti=jti).first()
-
-    @classmethod
-    def is_jti_blacklisted(cls, jti: str) -> bool:
-        query = cls.query.filter_by(jti=jti, revoked=True).first()
-        return bool(query)
