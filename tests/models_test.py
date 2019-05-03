@@ -4,7 +4,7 @@ from unittest.mock import Mock, patch
 import pytest
 from flask_sqlalchemy import SQLAlchemy
 
-from app.models import Token, User, db
+from app.models import Invitation, Token, User, db
 
 
 def test_init() -> None:
@@ -29,6 +29,53 @@ def _helper_column(  # type: ignore
 
     if string_length is not None:
         assert column.type.length == string_length
+
+
+class TestInvitation(object):
+    def test_subclass(self) -> None:
+        assert issubclass(User, db.Model)
+
+    def test_properties(self) -> None:
+        assert Invitation.__tablename__ == 'invitation'
+        assert len(Invitation.__table__.columns) == 4
+
+        _helper_column(
+            Invitation.__table__.columns.id,
+            'id',
+            db.Integer,
+            primary_key=True,
+            nullable=False,
+        )
+        _helper_column(
+            Invitation.__table__.columns.email,
+            'email',
+            db.String,
+            nullable=False,
+            string_length=255,
+        )
+        _helper_column(
+            Invitation.__table__.columns.is_admin,
+            'is_admin',
+            db.Boolean,
+            nullable=False,
+        )
+        _helper_column(
+            Invitation.__table__.columns.token,
+            'token',
+            db.String,
+            nullable=False,
+            string_length=255,
+        )
+
+    def test_save(self) -> None:
+        db.session.add = Mock()
+        db.session.commit = Mock()
+
+        invitation = Invitation(id=123)
+        invitation.save()
+
+        db.session.add.assert_called_once_with(invitation)
+        db.session.commit.assert_called_once_with()
 
 
 class TestToken(object):
