@@ -128,7 +128,7 @@ class TestUser(object):
 
     def test_properties(self) -> None:
         assert User.__tablename__ == 'user'
-        assert len(User.__table__.columns) == 3
+        assert len(User.__table__.columns) == 5
 
         _helper_column(
             User.__table__.columns.id,
@@ -151,6 +151,19 @@ class TestUser(object):
             db.String,
             nullable=False,
             string_length=255,
+        )
+        _helper_column(
+            User.__table__.columns.email,
+            'email',
+            db.String,
+            nullable=False,
+            string_length=255,
+        )
+        _helper_column(
+            User.__table__.columns.is_admin,
+            'is_admin',
+            db.Boolean,
+            nullable=False,
         )
 
     @patch('flask_sqlalchemy._QueryProperty.__get__')

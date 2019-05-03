@@ -37,6 +37,8 @@ class User(db.Model, _SaveMixin):  # type: ignore
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(255), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
+    email = db.Column(db.String(255), nullable=False)
+    is_admin = db.Column(db.Boolean, nullable=False)
 
     @classmethod
     def find_by_username(cls, username: str) -> 'User':
