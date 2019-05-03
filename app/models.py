@@ -1,5 +1,3 @@
-import datetime
-
 from flask_sqlalchemy import SQLAlchemy
 from passlib.hash import pbkdf2_sha256 as sha256
 
@@ -18,7 +16,7 @@ class Token(db.Model, _SaveMixin):  # type: ignore
     id = db.Column(db.Integer, primary_key=True)
     jti = db.Column(db.String(255), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
-    expires = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
+    expires = db.Column(db.DateTime, nullable=False)
     revoked = db.Column(db.Boolean, nullable=False)
 
     @classmethod

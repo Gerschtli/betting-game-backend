@@ -73,7 +73,6 @@ class TestToken(object):
         )
 
         # TODO: test user_id foreign_key
-        # TODO: test expires default
 
     @patch('flask_sqlalchemy._QueryProperty.__get__')
     def test_find_by_jti(self, mock_query: Mock) -> None:
