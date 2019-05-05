@@ -9,7 +9,7 @@ python36Packages.buildPythonApplication rec {
   propagatedBuildInputs = (import ./nixops/app.nix).libraries python36Packages;
 
   checkInputs = with python36Packages; [
-    pytest pytestrunner
+    pytest pytestrunner freezegun
   ];
   preCheck = "export APP_CONFIG_FILE=${./app/config/dev.py}";
   postCheck = "export APP_CONFIG_FILE=";
