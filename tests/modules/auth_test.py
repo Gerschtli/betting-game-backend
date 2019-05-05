@@ -58,7 +58,7 @@ class TestLogin(object):
             },
         )
 
-        assert get_validator_schema(mock_validate_schema) == schemas.USER
+        assert get_validator_schema(mock_validate_schema) == schemas.LOGIN
 
         mock_user.find_by_username.assert_called_once_with('flask')
         mock_user.verify_hash.assert_called_once_with('secret', 'hash')
@@ -101,7 +101,7 @@ class TestLogin(object):
             },
         )
 
-        assert get_validator_schema(mock_validate_schema) == schemas.USER
+        assert get_validator_schema(mock_validate_schema) == schemas.LOGIN
 
         mock_user.find_by_username.assert_called_once_with('flask')
         mock_user.verify_hash.assert_called_once_with('secret', 'hash')
@@ -128,7 +128,7 @@ class TestLogin(object):
             },
         )
 
-        assert get_validator_schema(mock_validate_schema) == schemas.USER
+        assert get_validator_schema(mock_validate_schema) == schemas.LOGIN
 
         mock_user.find_by_username.assert_called_once_with('flask')
 

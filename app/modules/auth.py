@@ -17,7 +17,7 @@ api = Api(module)
 
 @api.resource('/login')
 class Login(Resource):
-    @validate_schema(schemas.USER)
+    @validate_schema(schemas.LOGIN)
     @staticmethod
     def post() -> Dict[str, str]:
         data = request.get_json()
