@@ -14,9 +14,10 @@ class Invitation(db.Model, _SaveMixin):  # type: ignore
     __tablename__ = 'invitation'
 
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(255), nullable=False)
+    email = db.Column(db.String(255), unique=True, nullable=False)
     is_admin = db.Column(db.Boolean, nullable=False)
-    token = db.Column(db.String(255), nullable=False)
+    token = db.Column(db.String(255), unique=True, nullable=False)
+    expires = db.Column(db.DateTime, nullable=False)
 
 
 class Token(db.Model, _SaveMixin):  # type: ignore

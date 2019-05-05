@@ -37,7 +37,7 @@ class TestInvitation(object):
 
     def test_properties(self) -> None:
         assert Invitation.__tablename__ == 'invitation'
-        assert len(Invitation.__table__.columns) == 4
+        assert len(Invitation.__table__.columns) == 5
 
         _helper_column(
             Invitation.__table__.columns.id,
@@ -51,6 +51,7 @@ class TestInvitation(object):
             'email',
             db.String,
             nullable=False,
+            unique=True,
             string_length=255,
         )
         _helper_column(
@@ -64,7 +65,14 @@ class TestInvitation(object):
             'token',
             db.String,
             nullable=False,
+            unique=True,
             string_length=255,
+        )
+        _helper_column(
+            Token.__table__.columns.expires,
+            'expires',
+            db.DateTime,
+            nullable=False,
         )
 
     def test_save(self) -> None:
