@@ -48,6 +48,7 @@ class TestUsers(object):
         assert get_validator_schema(mock_validate_schema) == schemas.USER
         schema = get_validator_schema(mock_validate_input)
 
+        assert list(schema.keys()) == ['username', 'password', 'email']
         assert isinstance(schema['username'], matcher.And)
         assert len(schema['username'].matchers) == 2
         assert isinstance(schema['username'].matchers[0], matcher.NotBlank)
