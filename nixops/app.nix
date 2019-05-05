@@ -12,6 +12,8 @@ rec {
       allowPing = true;
     };
 
+    time.timeZone = "Europe/Berlin";
+
     users = {
       groups.${user} = {
         gid = uid;
