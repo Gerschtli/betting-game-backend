@@ -19,6 +19,7 @@ class Users(Resource):
             matcher.UniqueUsername(),
         ),
         'password': matcher.MinLength(6),
+        'email': matcher.NotBlank(),
     })
     @staticmethod
     def post() -> Response:
@@ -27,6 +28,8 @@ class Users(Resource):
         new_user = models.User(
             username=data['username'],
             password=models.User.generate_hash(data['password']),
+            email=data['email'],
+            is_admin=data['is_admin'],
         )
         new_user.save()
 

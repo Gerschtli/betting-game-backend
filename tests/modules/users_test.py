@@ -39,7 +39,9 @@ class TestUsers(object):
             '/users',
             json={
                 'username': 'flask',
-                'password': 'secret'
+                'password': 'secret',
+                'email': 'mail',
+                'is_admin': True,
             },
         )
 
@@ -52,9 +54,15 @@ class TestUsers(object):
         assert isinstance(schema['username'].matchers[1], matcher.UniqueUsername)
         assert isinstance(schema['password'], matcher.MinLength)
         assert schema['password'].min_length == 6
+        assert isinstance(schema['email'], matcher.NotBlank)
 
         mock_user.generate_hash.assert_called_once_with('secret')
-        mock_user.assert_called_once_with(username='flask', password='hash')
+        mock_user.assert_called_once_with(
+            username='flask',
+            password='hash',
+            email='mail',
+            is_admin=True,
+        )
         user_instance.save.assert_called_once_with()
 
         assert response.data == b''
