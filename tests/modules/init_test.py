@@ -1,6 +1,6 @@
 from unittest.mock import Mock, call
 
-from app.modules import auth, register_blueprints, secret, users
+from app.modules import auth, invitations, register_blueprints, secret, users
 
 
 def test_register_blueprint() -> None:
@@ -11,6 +11,7 @@ def test_register_blueprint() -> None:
 
     assert app.register_blueprint.call_args_list == [
         call(auth.module),
+        call(invitations.module),
         call(secret.module),
         call(users.module),
     ]
