@@ -63,7 +63,7 @@ class TestLogin(object):
         mock_user.find_by_username.assert_called_once_with('flask')
         mock_user.verify_hash.assert_called_once_with('secret', 'hash')
 
-        mock_create_token.assert_called_once_with(identity=123)
+        mock_create_token.assert_called_once_with(identity=current_user)
         mock_decode_token.assert_called_once_with('access_token')
 
         mock_token.assert_called_once_with(
