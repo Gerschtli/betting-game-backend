@@ -2,7 +2,8 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from app.validator.matcher import And, Matcher, MinLength, NotBlank, UniqueUsername
+from app.validator.matcher import (And, Matcher, MinLength, NotBlank, UniqueInvitationEmail,
+                                   UniqueUsername)
 
 
 class TestAnd(object):
@@ -98,6 +99,34 @@ class TestNotBlank(object):
             'type': 'not_blank',
             'path': 'path',
         }]
+
+
+class TestUniqueInvitationEmail(object):
+    def test_subclass(self) -> None:
+        assert issubclass(UniqueInvitationEmail, Matcher)
+
+    @patch('app.models.Invitation.find_by_email')
+    def test_success(self, mock_find_by_email: Mock) -> None:
+        mock_find_by_email.return_value = False
+
+        matcher = UniqueInvitationEmail()
+
+        assert matcher.validate('value', 'path') == []
+
+        mock_find_by_email.assert_called_once_with('value')
+
+    @patch('app.models.Invitation.find_by_email')
+    def test_fail(self, mock_find_by_email: Mock) -> None:
+        mock_find_by_email.return_value = True
+
+        matcher = UniqueInvitationEmail()
+
+        assert matcher.validate('value', 'path') == [{
+            'type': 'unique_email',
+            'path': 'path',
+        }]
+
+        mock_find_by_email.assert_called_once_with('value')
 
 
 class TestUniqueUsername(object):

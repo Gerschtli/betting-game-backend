@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional
 
-from ..models import User
+from ..models import Invitation, User
 
 
 def _error(type: str, path: str, options: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
@@ -47,6 +47,14 @@ class NotBlank(Matcher):
             return []
 
         return [_error('not_blank', path)]
+
+
+class UniqueInvitationEmail(Matcher):
+    def validate(self, data: str, path: str) -> List[Dict[str, Any]]:
+        if not Invitation.find_by_email(data):
+            return []
+
+        return [_error('unique_email', path)]
 
 
 class UniqueUsername(Matcher):
