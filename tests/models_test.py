@@ -90,6 +90,19 @@ class TestInvitation(object):
 
         assert result == expected
 
+    @patch('flask_sqlalchemy._QueryProperty.__get__')
+    def test_get_all(self, mock_query: Mock) -> None:
+        expected = [Invitation(id=123)]
+
+        all = mock_query.return_value.all
+        all.return_value = expected
+
+        result = Invitation.get_all()
+
+        all.assert_called_once_with()
+
+        assert result == expected
+
     def test_save(self) -> None:
         db.session.add = Mock()
         db.session.commit = Mock()

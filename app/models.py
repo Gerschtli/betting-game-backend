@@ -1,3 +1,5 @@
+from typing import List
+
 from flask_sqlalchemy import SQLAlchemy
 from passlib.hash import pbkdf2_sha256 as sha256
 
@@ -22,6 +24,10 @@ class Invitation(db.Model, _SaveMixin):  # type: ignore
     @classmethod
     def find_by_email(cls, email: str) -> 'Invitation':
         return cls.query.filter_by(email=email).first()
+
+    @classmethod
+    def get_all(cls) -> List['Invitation']:
+        return cls.query.all()
 
 
 class Token(db.Model, _SaveMixin):  # type: ignore
