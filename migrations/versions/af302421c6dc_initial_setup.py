@@ -21,8 +21,8 @@ def upgrade() -> None:
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('username', sa.String(length=255), nullable=False),
         sa.Column('password', sa.String(length=255), nullable=False),
-        sa.PrimaryKeyConstraint('id'),
-        sa.UniqueConstraint('username'),
+        sa.PrimaryKeyConstraint('id', name='pk_user'),
+        sa.UniqueConstraint('username', name='uq_user_username'),
     )
 
     op.create_table(
@@ -32,8 +32,13 @@ def upgrade() -> None:
         sa.Column('user_id', sa.Integer(), nullable=False),
         sa.Column('expires', sa.DateTime(), nullable=False),
         sa.Column('revoked', sa.Boolean(), nullable=False),
-        sa.ForeignKeyConstraint(['user_id'], ['user.id'], ondelete='CASCADE'),
-        sa.PrimaryKeyConstraint('id'),
+        sa.ForeignKeyConstraint(
+            ['user_id'],
+            ['user.id'],
+            ondelete='CASCADE',
+            name='fk_token_user_id_user_id',
+        ),
+        sa.PrimaryKeyConstraint('id', name='pk_token'),
     )
 
 

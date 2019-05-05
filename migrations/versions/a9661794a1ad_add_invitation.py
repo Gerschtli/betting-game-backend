@@ -22,7 +22,7 @@ def upgrade() -> None:
         sa.Column('email', sa.String(length=255), nullable=False),
         sa.Column('is_admin', sa.Boolean(), nullable=False),
         sa.Column('token', sa.String(length=255), nullable=False),
-        sa.PrimaryKeyConstraint('id'),
+        sa.PrimaryKeyConstraint('id', name='pk_invitation'),
     )
 
 
