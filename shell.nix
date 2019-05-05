@@ -64,6 +64,7 @@ in
       coverage
       flake8
       flake8-quotes
+      freezegun
       git-crypt
       isort
       mypy_
