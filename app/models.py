@@ -19,6 +19,10 @@ class Invitation(db.Model, _SaveMixin):  # type: ignore
     token = db.Column(db.String(255), unique=True, nullable=False)
     expires = db.Column(db.DateTime, nullable=False)
 
+    @classmethod
+    def find_by_email(cls, email: str) -> 'Invitation':
+        return cls.query.filter_by(email=email).first()
+
 
 class Token(db.Model, _SaveMixin):  # type: ignore
     __tablename__ = 'token'

@@ -75,6 +75,21 @@ class TestInvitation(object):
             nullable=False,
         )
 
+    @patch('flask_sqlalchemy._QueryProperty.__get__')
+    def test_find_by_email(self, mock_query: Mock) -> None:
+        expected = Invitation(id=123)
+
+        filter_by = mock_query.return_value.filter_by
+        first = filter_by.return_value.first
+        first.return_value = expected
+
+        result = Invitation.find_by_email('name-xyz')
+
+        filter_by.assert_called_once_with(email='name-xyz')
+        first.assert_called_once_with()
+
+        assert result == expected
+
     def test_save(self) -> None:
         db.session.add = Mock()
         db.session.commit = Mock()
