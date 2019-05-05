@@ -7,9 +7,14 @@ from flask_jwt_extended import JWTManager, create_access_token
 RT = TypeVar('RT')
 
 
-def build_authorization_headers(app: Flask) -> Dict[str, str]:
+def build_authorization_headers(app: Flask, is_admin: bool = False) -> Dict[str, str]:
     app.config['JWT_SECRET_KEY'] = 'abcxyz'
-    JWTManager(app)
+    jwt = JWTManager(app)
+
+    @jwt.user_claims_loader
+    def add_claims_to_access_token(data: str) -> Dict[str, bool]:
+        nonlocal is_admin
+        return {'is_admin': is_admin}
 
     with app.test_request_context():
         access_token = create_access_token('testuser')
