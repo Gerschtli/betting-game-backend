@@ -164,3 +164,24 @@ class TestLogout(object):
 
         assert response.data == b''
         assert response.status_code == HTTPStatus.NO_CONTENT
+
+    @patch('app.models.Token')
+    @patch('flask_jwt_extended.get_raw_jwt')
+    def test_post_with_no_token(self, mock_get_jwt: Mock, mock_token: Mock, app: Flask) -> None:
+        mock_get_jwt.return_value = {'jti': 'token_jti'}
+
+        mock_token.find_by_jti.return_value = None
+
+        app.register_blueprint(auth.module)
+
+        client = app.test_client()
+
+        response = client.post(  # type: ignore
+            '/auth/logout',
+            headers=build_authorization_headers(app),
+        )
+
+        mock_token.find_by_jti.assert_called_once_with('token_jti')
+
+        assert response.data == b''
+        assert response.status_code == HTTPStatus.NO_CONTENT

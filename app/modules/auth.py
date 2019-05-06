@@ -50,7 +50,8 @@ class Logout(AuthenticatedResource):
         jti = flask_jwt_extended.get_raw_jwt()['jti']
 
         token = models.Token.find_by_jti(jti)
-        token.revoked = True
-        token.save()
+        if token is not None:
+            token.revoked = True
+            token.save()
 
         return no_content()

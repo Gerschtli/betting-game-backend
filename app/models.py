@@ -22,7 +22,7 @@ class Invitation(db.Model, _SaveMixin):  # type: ignore
     expires = db.Column(db.DateTime, nullable=False)
 
     @classmethod
-    def find_by_email(cls, email: str, ignore_id: Optional[int]) -> 'Invitation':
+    def find_by_email(cls, email: str, ignore_id: Optional[int]) -> Optional['Invitation']:
         query = cls.query.filter_by(email=email)
 
         if ignore_id is not None:
@@ -31,7 +31,7 @@ class Invitation(db.Model, _SaveMixin):  # type: ignore
         return query.first()
 
     @classmethod
-    def find_by_id(cls, id: int) -> 'Invitation':
+    def find_by_id(cls, id: int) -> Optional['Invitation']:
         return cls.query.filter_by(id=id).first()
 
     @classmethod
@@ -49,7 +49,7 @@ class Token(db.Model, _SaveMixin):  # type: ignore
     revoked = db.Column(db.Boolean, nullable=False)
 
     @classmethod
-    def find_by_jti(cls, jti: str) -> 'Token':
+    def find_by_jti(cls, jti: str) -> Optional['Token']:
         return cls.query.filter_by(jti=jti).first()
 
     @classmethod
@@ -68,7 +68,7 @@ class User(db.Model, _SaveMixin):  # type: ignore
     is_admin = db.Column(db.Boolean, nullable=False)
 
     @classmethod
-    def find_by_username(cls, username: str) -> 'User':
+    def find_by_username(cls, username: str) -> Optional['User']:
         return cls.query.filter_by(username=username).first()
 
     @staticmethod
