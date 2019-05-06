@@ -3,6 +3,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.sql.elements import BinaryExpression
 
 from app.models import Invitation, Token, User, db
 
@@ -29,6 +30,14 @@ def _helper_column(  # type: ignore
 
     if string_length is not None:
         assert column.type.length == string_length
+
+
+class _BinaryExpressionMatcher(object):
+    def __init__(self, expected: BinaryExpression) -> None:
+        self._expected = expected
+
+    def __eq__(self, actual: BinaryExpression) -> bool:
+        return self._expected.compare(actual)
 
 
 class TestInvitation(object):
@@ -83,9 +92,41 @@ class TestInvitation(object):
         first = filter_by.return_value.first
         first.return_value = expected
 
-        result = Invitation.find_by_email('name-xyz')
+        result = Invitation.find_by_email('name-xyz', None)
 
         filter_by.assert_called_once_with(email='name-xyz')
+        first.assert_called_once_with()
+
+        assert result == expected
+
+    @patch('flask_sqlalchemy._QueryProperty.__get__')
+    def test_find_by_email_with_id(self, mock_query: Mock) -> None:
+        expected = Invitation(id=123)
+
+        filter_by = mock_query.return_value.filter_by
+        filter = filter_by.return_value.filter
+        first = filter.return_value.first
+        first.return_value = expected
+
+        result = Invitation.find_by_email('name-xyz', 654)
+
+        filter_by.assert_called_once_with(email='name-xyz')
+        filter.assert_called_once_with(_BinaryExpressionMatcher(Invitation.id != 654))
+        first.assert_called_once_with()
+
+        assert result == expected
+
+    @patch('flask_sqlalchemy._QueryProperty.__get__')
+    def test_find_by_id(self, mock_query: Mock) -> None:
+        expected = Invitation(id=123)
+
+        filter_by = mock_query.return_value.filter_by
+        first = filter_by.return_value.first
+        first.return_value = expected
+
+        result = Invitation.find_by_id(123)
+
+        filter_by.assert_called_once_with(id=123)
         first.assert_called_once_with()
 
         assert result == expected

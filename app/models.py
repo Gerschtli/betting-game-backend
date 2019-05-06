@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from flask_sqlalchemy import SQLAlchemy
 from passlib.hash import pbkdf2_sha256 as sha256
@@ -22,8 +22,17 @@ class Invitation(db.Model, _SaveMixin):  # type: ignore
     expires = db.Column(db.DateTime, nullable=False)
 
     @classmethod
-    def find_by_email(cls, email: str) -> 'Invitation':
-        return cls.query.filter_by(email=email).first()
+    def find_by_email(cls, email: str, ignore_id: Optional[int]) -> 'Invitation':
+        query = cls.query.filter_by(email=email)
+
+        if ignore_id is not None:
+            query = query.filter(Invitation.id != ignore_id)
+
+        return query.first()
+
+    @classmethod
+    def find_by_id(cls, id: int) -> 'Invitation':
+        return cls.query.filter_by(id=id).first()
 
     @classmethod
     def get_all(cls) -> List['Invitation']:
