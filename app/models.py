@@ -6,13 +6,19 @@ from passlib.hash import pbkdf2_sha256 as sha256
 db = SQLAlchemy()
 
 
+class _DeleteMixin(object):
+    def delete(self) -> None:
+        db.session.delete(self)
+        db.session.commit()
+
+
 class _SaveMixin(object):
     def save(self) -> None:
         db.session.add(self)
         db.session.commit()
 
 
-class Invitation(db.Model, _SaveMixin):  # type: ignore
+class Invitation(db.Model, _DeleteMixin, _SaveMixin):  # type: ignore
     __tablename__ = 'invitation'
 
     id = db.Column(db.Integer, primary_key=True)

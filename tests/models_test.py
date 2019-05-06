@@ -84,6 +84,16 @@ class TestInvitation(object):
             nullable=False,
         )
 
+    def test_delete(self) -> None:
+        db.session.delete = Mock()
+        db.session.commit = Mock()
+
+        invitation = Invitation(id=123)
+        invitation.delete()
+
+        db.session.delete.assert_called_once_with(invitation)
+        db.session.commit.assert_called_once_with()
+
     @patch('flask_sqlalchemy._QueryProperty.__get__')
     def test_find_by_email(self, mock_query: Mock) -> None:
         expected = Invitation(id=123)
