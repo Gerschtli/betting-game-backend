@@ -16,7 +16,7 @@ def _validate_input(schema: Dict[str, Matcher], wrapped: Callable[..., RT], args
     data = request.get_json()
 
     for key in schema:
-        errors.extend(schema[key].validate(data[key], key))
+        errors.extend(schema[key].validate(data[key], key, kwargs))
 
     if errors:
         raise InputValidationError(errors)

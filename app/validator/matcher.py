@@ -14,7 +14,8 @@ def _error(type: str, path: str, options: Optional[Dict[str, Any]] = None) -> Di
 
 class Matcher(ABC):
     @abstractmethod
-    def validate(self, data: Any, path: str) -> List[Dict[str, Any]]:  # pragma: no cover
+    def validate(self, data: Any, path: str,
+                 params: Dict[str, Any]) -> List[Dict[str, Any]]:  # pragma: no cover
         pass
 
 
@@ -22,10 +23,10 @@ class And(Matcher):
     def __init__(self, *matchers: Matcher) -> None:
         self.matchers = matchers
 
-    def validate(self, data: Any, path: str) -> List[Dict[str, Any]]:
+    def validate(self, data: Any, path: str, params: Dict[str, Any]) -> List[Dict[str, Any]]:
         errors = []
         for matcher in self.matchers:
-            errors.extend(matcher.validate(data, path))
+            errors.extend(matcher.validate(data, path, params))
 
         return errors
 
@@ -34,7 +35,7 @@ class MinLength(Matcher):
     def __init__(self, min_length: int) -> None:
         self.min_length = min_length
 
-    def validate(self, data: str, path: str) -> List[Dict[str, Any]]:
+    def validate(self, data: str, path: str, params: Dict[str, Any]) -> List[Dict[str, Any]]:
         if len(data) >= self.min_length:
             return []
 
@@ -42,7 +43,7 @@ class MinLength(Matcher):
 
 
 class NotBlank(Matcher):
-    def validate(self, data: str, path: str) -> List[Dict[str, Any]]:
+    def validate(self, data: str, path: str, params: Dict[str, Any]) -> List[Dict[str, Any]]:
         if data:
             return []
 
@@ -50,15 +51,21 @@ class NotBlank(Matcher):
 
 
 class UniqueInvitationEmail(Matcher):
-    def validate(self, data: str, path: str) -> List[Dict[str, Any]]:
-        if not Invitation.find_by_email(data):
+    def __init__(self, ignore_id: bool = False) -> None:
+        self._ignore_id = ignore_id
+
+    def validate(self, data: str, path: str, params: Dict[str, Any]) -> List[Dict[str, Any]]:
+        if not Invitation.find_by_email(
+                data,
+                params['id'] if self._ignore_id else None,
+        ):
             return []
 
         return [_error('unique_email', path)]
 
 
 class UniqueUsername(Matcher):
-    def validate(self, data: str, path: str) -> List[Dict[str, Any]]:
+    def validate(self, data: str, path: str, params: Dict[str, Any]) -> List[Dict[str, Any]]:
         if not User.find_by_username(data):
             return []
 
