@@ -52,12 +52,12 @@ class NotBlank(Matcher):
 
 class UniqueInvitationEmail(Matcher):
     def __init__(self, ignore_id: bool = False) -> None:
-        self._ignore_id = ignore_id
+        self.ignore_id = ignore_id
 
     def validate(self, data: str, path: str, params: Dict[str, Any]) -> List[Dict[str, Any]]:
         if not Invitation.find_by_email(
                 data,
-                params['id'] if self._ignore_id else None,
+                params['id'] if self.ignore_id else None,
         ):
             return []
 

@@ -81,6 +81,7 @@ class TestInvitations(object):
         assert len(schema['email'].matchers) == 2
         assert isinstance(schema['email'].matchers[0], matcher.NotBlank)
         assert isinstance(schema['email'].matchers[1], matcher.UniqueInvitationEmail)
+        assert not schema['email'].matchers[1].ignore_id
 
         mock_get_invitation_expire.assert_called_once_with()
 
