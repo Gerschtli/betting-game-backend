@@ -18,10 +18,10 @@ class TestAnd(object):
 
         matcher = And(matcher1, matcher2)
 
-        assert matcher.validate('data', 'path', {'test': 'value'}) == []
+        assert matcher.validate('data', {'test': 'value'}) == []
 
-        matcher1.validate.assert_called_once_with('data', 'path', {'test': 'value'})
-        matcher2.validate.assert_called_once_with('data', 'path', {'test': 'value'})
+        matcher1.validate.assert_called_once_with('data', {'test': 'value'})
+        matcher2.validate.assert_called_once_with('data', {'test': 'value'})
 
     def test_fail(self) -> None:
         matcher1 = Mock('app.matcher.Matcher', autospec=True)
@@ -31,10 +31,10 @@ class TestAnd(object):
 
         matcher = And(matcher1, matcher2)
 
-        assert matcher.validate('data', 'path', {'test': 'value'}) == [{'error': 1}, {'error': 2}]
+        assert matcher.validate('data', {'test': 'value'}) == [{'error': 1}, {'error': 2}]
 
-        matcher1.validate.assert_called_once_with('data', 'path', {'test': 'value'})
-        matcher2.validate.assert_called_once_with('data', 'path', {'test': 'value'})
+        matcher1.validate.assert_called_once_with('data', {'test': 'value'})
+        matcher2.validate.assert_called_once_with('data', {'test': 'value'})
 
 
 class TestMinLength(object):
@@ -52,7 +52,7 @@ class TestMinLength(object):
     def test_success(self, value: str) -> None:
         matcher = MinLength(3)
 
-        assert matcher.validate(value, 'path', {}) == []
+        assert matcher.validate(value, {}) == []
 
     @pytest.mark.parametrize(
         'value',
@@ -65,9 +65,8 @@ class TestMinLength(object):
     def test_fail(self, value: str) -> None:
         matcher = MinLength(3)
 
-        assert matcher.validate(value, 'path', {}) == [{
+        assert matcher.validate(value, {}) == [{
             'type': 'min_length',
-            'path': 'path',
             'options': {
                 'value': 3
             },
@@ -90,15 +89,12 @@ class TestNotBlank(object):
     def test_success(self, value: str) -> None:
         matcher = NotBlank()
 
-        assert matcher.validate(value, 'path', {}) == []
+        assert matcher.validate(value, {}) == []
 
     def test_fail(self) -> None:
         matcher = NotBlank()
 
-        assert matcher.validate('', 'path', {}) == [{
-            'type': 'not_blank',
-            'path': 'path',
-        }]
+        assert matcher.validate('', {}) == [{'type': 'not_blank'}]
 
 
 class TestUniqueInvitationEmail(object):
@@ -111,7 +107,7 @@ class TestUniqueInvitationEmail(object):
 
         matcher = UniqueInvitationEmail()
 
-        assert matcher.validate('value', 'path', {'id': 123}) == []
+        assert matcher.validate('value', {'id': 123}) == []
 
         mock_find_by_email.assert_called_once_with('value', None)
 
@@ -121,10 +117,7 @@ class TestUniqueInvitationEmail(object):
 
         matcher = UniqueInvitationEmail()
 
-        assert matcher.validate('value', 'path', {'id': 123}) == [{
-            'type': 'unique_email',
-            'path': 'path',
-        }]
+        assert matcher.validate('value', {'id': 123}) == [{'type': 'unique_email'}]
 
         mock_find_by_email.assert_called_once_with('value', None)
 
@@ -134,7 +127,7 @@ class TestUniqueInvitationEmail(object):
 
         matcher = UniqueInvitationEmail(True)
 
-        assert matcher.validate('value', 'path', {'id': 123}) == []
+        assert matcher.validate('value', {'id': 123}) == []
 
         mock_find_by_email.assert_called_once_with('value', 123)
 
@@ -144,10 +137,7 @@ class TestUniqueInvitationEmail(object):
 
         matcher = UniqueInvitationEmail(True)
 
-        assert matcher.validate('value', 'path', {'id': 123}) == [{
-            'type': 'unique_email',
-            'path': 'path',
-        }]
+        assert matcher.validate('value', {'id': 123}) == [{'type': 'unique_email'}]
 
         mock_find_by_email.assert_called_once_with('value', 123)
 
@@ -162,7 +152,7 @@ class TestUniqueUsername(object):
 
         matcher = UniqueUsername()
 
-        assert matcher.validate('value', 'path', {}) == []
+        assert matcher.validate('value', {}) == []
 
         mock_find_by_username.assert_called_once_with('value')
 
@@ -172,9 +162,6 @@ class TestUniqueUsername(object):
 
         matcher = UniqueUsername()
 
-        assert matcher.validate('value', 'path', {}) == [{
-            'type': 'unique_username',
-            'path': 'path',
-        }]
+        assert matcher.validate('value', {}) == [{'type': 'unique_username'}]
 
         mock_find_by_username.assert_called_once_with('value')

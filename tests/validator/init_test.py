@@ -36,8 +36,8 @@ def test_validate_input(mock_get_json: Mock) -> None:
     assert function('string', arg2=23) == 6
 
     mock_get_json.assert_called_once_with()
-    matcher1.validate.assert_called_once_with('value1', 'key1', {'arg2': 23})
-    matcher2.validate.assert_called_once_with('value2', 'key2', {'arg2': 23})
+    matcher1.validate.assert_called_once_with('value1', {'arg2': 23})
+    matcher2.validate.assert_called_once_with('value2', {'arg2': 23})
 
 
 @patch('app.request.get_json')
@@ -63,13 +63,27 @@ def test_validate_input_with_error(mock_get_json: Mock) -> None:
         function('string', arg2=23)
     except Exception as e:
         assert isinstance(e, InputValidationError)
-        assert e.errors == [{'error': 1}, {'error': 2}, {'error': 3}]
+        assert e.errors == {
+            'key1': [
+                {
+                    'error': 1
+                },
+                {
+                    'error': 2
+                },
+            ],
+            'key2': [
+                {
+                    'error': 3
+                },
+            ],
+        }
     else:
         assert False, 'should throw exception'
 
     mock_get_json.assert_called_once_with()
-    matcher1.validate.assert_called_once_with('value1', 'key1', {'arg2': 23})
-    matcher2.validate.assert_called_once_with('value2', 'key2', {'arg2': 23})
+    matcher1.validate.assert_called_once_with('value1', {'arg2': 23})
+    matcher2.validate.assert_called_once_with('value2', {'arg2': 23})
 
 
 @patch('app.request.get_json')

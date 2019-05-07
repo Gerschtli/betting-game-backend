@@ -4,8 +4,8 @@ from typing import Any, Dict, List, Optional
 from ..models import Invitation, User
 
 
-def _error(type: str, path: str, options: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-    error: Dict[str, Any] = {'type': type, 'path': path}
+def _error(type: str, options: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    error: Dict[str, Any] = {'type': type}
     if options is not None:
         error['options'] = options
 
@@ -14,7 +14,7 @@ def _error(type: str, path: str, options: Optional[Dict[str, Any]] = None) -> Di
 
 class Matcher(ABC):
     @abstractmethod
-    def validate(self, data: Any, path: str,
+    def validate(self, data: Any,
                  params: Dict[str, Any]) -> List[Dict[str, Any]]:  # pragma: no cover
         pass
 
@@ -23,10 +23,10 @@ class And(Matcher):
     def __init__(self, *matchers: Matcher) -> None:
         self.matchers = matchers
 
-    def validate(self, data: Any, path: str, params: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def validate(self, data: Any, params: Dict[str, Any]) -> List[Dict[str, Any]]:
         errors = []
         for matcher in self.matchers:
-            errors.extend(matcher.validate(data, path, params))
+            errors.extend(matcher.validate(data, params))
 
         return errors
 
@@ -35,38 +35,38 @@ class MinLength(Matcher):
     def __init__(self, min_length: int) -> None:
         self.min_length = min_length
 
-    def validate(self, data: str, path: str, params: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def validate(self, data: str, params: Dict[str, Any]) -> List[Dict[str, Any]]:
         if len(data) >= self.min_length:
             return []
 
-        return [_error('min_length', path, {'value': self.min_length})]
+        return [_error('min_length', {'value': self.min_length})]
 
 
 class NotBlank(Matcher):
-    def validate(self, data: str, path: str, params: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def validate(self, data: str, params: Dict[str, Any]) -> List[Dict[str, Any]]:
         if data:
             return []
 
-        return [_error('not_blank', path)]
+        return [_error('not_blank')]
 
 
 class UniqueInvitationEmail(Matcher):
     def __init__(self, ignore_id: bool = False) -> None:
         self.ignore_id = ignore_id
 
-    def validate(self, data: str, path: str, params: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def validate(self, data: str, params: Dict[str, Any]) -> List[Dict[str, Any]]:
         if not Invitation.find_by_email(
                 data,
                 params['id'] if self.ignore_id else None,
         ):
             return []
 
-        return [_error('unique_email', path)]
+        return [_error('unique_email')]
 
 
 class UniqueUsername(Matcher):
-    def validate(self, data: str, path: str, params: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def validate(self, data: str, params: Dict[str, Any]) -> List[Dict[str, Any]]:
         if not User.find_by_username(data):
             return []
 
-        return [_error('unique_username', path)]
+        return [_error('unique_username')]

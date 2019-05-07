@@ -12,11 +12,13 @@ RT = TypeVar('RT')
 
 def _validate_input(schema: Dict[str, Matcher], wrapped: Callable[..., RT], args: List[Any],
                     kwargs: Dict[str, Any]) -> RT:
-    errors = []
+    errors = {}
     data = request.get_json()
 
     for key in schema:
-        errors.extend(schema[key].validate(data[key], key, kwargs))
+        error = schema[key].validate(data[key], kwargs)
+        if error:
+            errors[key] = error
 
     if errors:
         raise InputValidationError(errors)
