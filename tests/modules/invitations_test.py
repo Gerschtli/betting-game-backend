@@ -24,8 +24,8 @@ class TestInvitations(object):
     @patch('app.models.Invitation.get_all')
     def test_get(self, mock_get_all: Mock, app: Flask) -> None:
         mock_get_all.return_value = [
-            Invitation(email='email', is_admin=True),
-            Invitation(email='email2', is_admin=False),
+            Invitation(id=12, email='email', is_admin=True),
+            Invitation(id=23, email='email2', is_admin=False),
         ]
 
         app.register_blueprint(invitations.module)
@@ -39,8 +39,8 @@ class TestInvitations(object):
 
         mock_get_all.assert_called_once_with()
 
-        assert response.data == (b'[{"email": "email", "is_admin": true}, '
-                                 b'{"email": "email2", "is_admin": false}]\n')
+        assert response.data == (b'[{"id": 12, "email": "email", "is_admin": true}, '
+                                 b'{"id": 23, "email": "email2", "is_admin": false}]\n')
         assert response.status_code == HTTPStatus.OK
 
     @patch('app.models.Invitation')
@@ -92,6 +92,130 @@ class TestInvitations(object):
             expires=123,
         )
         invitation_instance.save.assert_called_once_with()
+
+        assert response.data == b''
+        assert response.status_code == HTTPStatus.NO_CONTENT
+
+
+class TestInvitation(object):
+    def test_subclass(self) -> None:
+        assert issubclass(invitations.Invitation, AdminResource)
+
+    @patch('app.models.Invitation')
+    @patch('app.validator._validate_input')
+    @patch('app.validator._validate_schema')
+    def test_put(self, mock_validate_schema: Mock, mock_validate_input: Mock, mock_invitation: Mock,
+                 app: Flask) -> None:
+        mock_validate_schema.side_effect = validator_call_through
+        mock_validate_input.side_effect = validator_call_through
+
+        invitation_instance = Mock('app.models.Invitation')
+        invitation_instance.save = Mock()
+        mock_invitation.find_by_id.return_value = invitation_instance
+
+        app.register_blueprint(invitations.module)
+
+        client = app.test_client()
+
+        response = client.put(  # type: ignore
+            '/invitations/321',
+            headers=build_authorization_headers(app, is_admin=True),
+            json={
+                'email': 'mail',
+                'is_admin': True,
+            },
+        )
+
+        assert get_validator_schema(mock_validate_schema) == schemas.INVITATION
+        schema = get_validator_schema(mock_validate_input)
+
+        assert list(schema.keys()) == ['email']
+        assert isinstance(schema['email'], matcher.And)
+        assert len(schema['email'].matchers) == 2
+        assert isinstance(schema['email'].matchers[0], matcher.NotBlank)
+        assert isinstance(schema['email'].matchers[1], matcher.UniqueInvitationEmail)
+        assert schema['email'].matchers[1].ignore_id
+
+        mock_invitation.find_by_id.assert_called_once_with(321)
+        assert invitation_instance.email == 'mail'
+        assert invitation_instance.is_admin
+        invitation_instance.save.assert_called_once_with()
+
+        assert response.data == b''
+        assert response.status_code == HTTPStatus.NO_CONTENT
+
+    @patch('app.models.Invitation')
+    @patch('app.validator._validate_input')
+    @patch('app.validator._validate_schema')
+    def test_put_when_not_found(self, mock_validate_schema: Mock, mock_validate_input: Mock,
+                                mock_invitation: Mock, app: Flask) -> None:
+        mock_validate_schema.side_effect = validator_call_through
+        mock_validate_input.side_effect = validator_call_through
+
+        mock_invitation.find_by_id.return_value = None
+
+        app.register_blueprint(invitations.module)
+
+        client = app.test_client()
+
+        response = client.put(  # type: ignore
+            '/invitations/321',
+            headers=build_authorization_headers(app, is_admin=True),
+            json={
+                'email': 'mail',
+                'is_admin': True,
+            },
+        )
+
+        assert get_validator_schema(mock_validate_schema) == schemas.INVITATION
+        schema = get_validator_schema(mock_validate_input)
+
+        assert list(schema.keys()) == ['email']
+        assert isinstance(schema['email'], matcher.And)
+        assert len(schema['email'].matchers) == 2
+        assert isinstance(schema['email'].matchers[0], matcher.NotBlank)
+        assert isinstance(schema['email'].matchers[1], matcher.UniqueInvitationEmail)
+        assert schema['email'].matchers[1].ignore_id
+
+        mock_invitation.find_by_id.assert_called_once_with(321)
+
+        assert response.status_code == HTTPStatus.NOT_FOUND
+
+    @patch('app.models.Invitation')
+    def test_delete(self, mock_invitation: Mock, app: Flask) -> None:
+        invitation_instance = Mock('app.models.Invitation')
+        invitation_instance.delete = Mock()
+        mock_invitation.find_by_id.return_value = invitation_instance
+
+        app.register_blueprint(invitations.module)
+
+        client = app.test_client()
+
+        response = client.delete(  # type: ignore
+            '/invitations/321',
+            headers=build_authorization_headers(app, is_admin=True),
+        )
+
+        mock_invitation.find_by_id.assert_called_once_with(321)
+        invitation_instance.delete.assert_called_once_with()
+
+        assert response.data == b''
+        assert response.status_code == HTTPStatus.NO_CONTENT
+
+    @patch('app.models.Invitation')
+    def test_delete_when_not_found(self, mock_invitation: Mock, app: Flask) -> None:
+        mock_invitation.find_by_id.return_value = None
+
+        app.register_blueprint(invitations.module)
+
+        client = app.test_client()
+
+        response = client.delete(  # type: ignore
+            '/invitations/321',
+            headers=build_authorization_headers(app, is_admin=True),
+        )
+
+        mock_invitation.find_by_id.assert_called_once_with(321)
 
         assert response.data == b''
         assert response.status_code == HTTPStatus.NO_CONTENT
