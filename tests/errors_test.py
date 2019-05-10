@@ -10,14 +10,28 @@ from app.errors import InputValidationError, SchemaValidationError, register_err
 
 
 class TestInputValidationError(object):
+    def test_build_general_eror(self) -> None:
+        error = InputValidationError.build_general_error('type1')
+
+        assert error.errors == {
+            '_general': {
+                'type': 'type1',
+            },
+        }
+
     def test_init(self) -> None:
-        errors = [{
-            'abc': 'xy',
-            'de': 1,
-        }, {
-            'abc': '11',
-            'de': 12,
-        }]
+        errors = {
+            'field': [
+                {
+                    'abc': 'xy',
+                    'de': 1,
+                },
+                {
+                    'abc': '11',
+                    'de': 12,
+                },
+            ],
+        }
 
         error = InputValidationError(errors)
 
@@ -58,9 +72,9 @@ class TestRegisterErrorHandler(object):
         ]
 
     def test_input_validation_error(self, app: Flask) -> None:
-        response = self._get_response(app, InputValidationError([{'abc': 'def'}]))
+        response = self._get_response(app, InputValidationError({'field': [{'abc': 'def'}]}))
 
-        assert response.data == b'[{"abc":"def"}]\n'
+        assert response.data == b'{"field":[{"abc":"def"}]}\n'
         assert response.status_code == HTTPStatus.BAD_REQUEST
 
     def test_not_found(self, app: Flask) -> None:

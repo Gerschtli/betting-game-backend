@@ -15,6 +15,10 @@ class InputValidationError(Exception):
     def __init__(self, errors: Dict[str, Any]) -> None:
         self.errors = errors
 
+    @staticmethod
+    def build_general_error(type: str) -> 'InputValidationError':
+        return InputValidationError({'_general': {'type': type}})
+
 
 class SchemaValidationError(Exception):
     def __init__(self, errors: List[ValidationError]) -> None:
