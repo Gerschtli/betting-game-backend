@@ -5,10 +5,10 @@ from unittest.mock import Mock, patch
 from flask import Blueprint, Flask
 
 from app.modules import auth
-from app.resource import AuthenticatedResource, Resource
+from app.resource import Resource
 from app.validator import schemas
 
-from .utils import build_authorization_headers, get_validator_schema, validator_call_through
+from .utils import get_validator_schema, validator_call_through
 
 
 def test_module() -> None:
@@ -159,7 +159,7 @@ class TestLogin(object):
 
 class TestLogout(object):
     def test_subclass(self) -> None:
-        assert issubclass(auth.Logout, AuthenticatedResource)
+        assert issubclass(auth.Logout, Resource)
 
     @patch('app.models.Token')
     @patch('flask_jwt_extended.get_raw_jwt')
@@ -175,10 +175,9 @@ class TestLogout(object):
 
         client = app.test_client()
 
-        response = client.post(  # type: ignore
-            '/auth/logout',
-            headers=build_authorization_headers(app),
-        )
+        response = client.post('/auth/logout')  # type: ignore
+
+        mock_get_jwt.assert_called_once_with()
 
         mock_token.find_by_jti.assert_called_once_with('token_jti')
         token_instance.save.assert_called_once_with()
@@ -198,12 +197,26 @@ class TestLogout(object):
 
         client = app.test_client()
 
-        response = client.post(  # type: ignore
-            '/auth/logout',
-            headers=build_authorization_headers(app),
-        )
+        response = client.post('/auth/logout')  # type: ignore
+
+        mock_get_jwt.assert_called_once_with()
 
         mock_token.find_by_jti.assert_called_once_with('token_jti')
+
+        assert response.data == b''
+        assert response.status_code == HTTPStatus.NO_CONTENT
+
+    @patch('flask_jwt_extended.get_raw_jwt')
+    def test_post_with_no_jwt(self, mock_get_jwt: Mock, app: Flask) -> None:
+        mock_get_jwt.return_value = {}
+
+        app.register_blueprint(auth.module)
+
+        client = app.test_client()
+
+        response = client.post('/auth/logout')  # type: ignore
+
+        mock_get_jwt.assert_called_once_with()
 
         assert response.data == b''
         assert response.status_code == HTTPStatus.NO_CONTENT

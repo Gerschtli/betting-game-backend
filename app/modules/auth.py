@@ -7,7 +7,7 @@ from flask_restful import Api
 
 from .. import models, request
 from ..errors import InputValidationError
-from ..resource import AuthenticatedResource, Resource
+from ..resource import Resource
 from ..response import Response, no_content
 from ..validator import schemas, validate_schema
 
@@ -44,14 +44,17 @@ class Login(Resource):
 
 
 @api.resource('/logout')
-class Logout(AuthenticatedResource):
+class Logout(Resource):
     @staticmethod
     def post() -> Response:
-        jti = flask_jwt_extended.get_raw_jwt()['jti']
+        raw_jwt = flask_jwt_extended.get_raw_jwt()
 
-        token = models.Token.find_by_jti(jti)
-        if token is not None:
-            token.revoked = True
-            token.save()
+        if 'jti' in raw_jwt:
+            jti = raw_jwt['jti']
+
+            token = models.Token.find_by_jti(jti)
+            if token is not None:
+                token.revoked = True
+                token.save()
 
         return no_content()
