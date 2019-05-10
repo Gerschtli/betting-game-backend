@@ -4,9 +4,9 @@ from typing import Dict
 import flask_jwt_extended
 from flask import Blueprint
 from flask_restful import Api
-from werkzeug.exceptions import Unauthorized
 
 from .. import models, request
+from ..errors import InputValidationError
 from ..resource import AuthenticatedResource, Resource
 from ..response import Response, no_content
 from ..validator import schemas, validate_schema
@@ -24,7 +24,7 @@ class Login(Resource):
         current_user = models.User.find_by_username(data['username'])
 
         if not current_user or not models.User.verify_hash(data['password'], current_user.password):
-            raise Unauthorized()
+            raise InputValidationError.build_general_error('login_failed')
 
         access_token = flask_jwt_extended.create_access_token(identity=current_user)
         decoded_token = flask_jwt_extended.decode_token(access_token)

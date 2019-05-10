@@ -77,10 +77,11 @@ class TestLogin(object):
         assert response.data == b'{"access_token": "access_token", "id": 123}\n'
         assert response.status_code == HTTPStatus.OK
 
+    @patch('app.errors.InputValidationError.build_general_error')
     @patch('app.models.User')
     @patch('app.validator._validate_schema')
     def test_post_with_wrong_password(self, mock_validate_schema: Mock, mock_user: Mock,
-                                      app: Flask) -> None:
+                                      mock_build_general_error: Mock, app: Flask) -> None:
         mock_validate_schema.side_effect = validator_call_through
 
         current_user = Mock('app.models.User')
@@ -89,50 +90,71 @@ class TestLogin(object):
         mock_user.find_by_username.return_value = current_user
         mock_user.verify_hash.return_value = False
 
+        mock_build_general_error.return_value = Exception('login error')
+
         app.register_blueprint(auth.module)
 
         client = app.test_client()
 
-        response = client.post(  # type: ignore
-            '/auth/login',
-            json={
-                'username': 'flask',
-                'password': 'secret'
-            },
-        )
+        exception = None
+        try:
+            client.post(  # type: ignore
+                '/auth/login',
+                json={
+                    'username': 'flask',
+                    'password': 'secret'
+                },
+            )
+        except Exception as err:
+            exception = err
 
         assert get_validator_schema(mock_validate_schema) == schemas.LOGIN
 
         mock_user.find_by_username.assert_called_once_with('flask')
         mock_user.verify_hash.assert_called_once_with('secret', 'hash')
 
-        assert response.status_code == HTTPStatus.UNAUTHORIZED
+        mock_build_general_error.assert_called_once_with('login_failed')
 
+        assert exception is not None
+        assert isinstance(exception, Exception)
+        assert str(exception) == 'login error'
+
+    @patch('app.errors.InputValidationError.build_general_error')
     @patch('app.models.User')
     @patch('app.validator._validate_schema')
     def test_post_with_no_user(self, mock_validate_schema: Mock, mock_user: Mock,
-                               app: Flask) -> None:
+                               mock_build_general_error: Mock, app: Flask) -> None:
         mock_validate_schema.side_effect = validator_call_through
 
         mock_user.find_by_username.return_value = None
+
+        mock_build_general_error.return_value = Exception('login error')
 
         app.register_blueprint(auth.module)
 
         client = app.test_client()
 
-        response = client.post(  # type: ignore
-            '/auth/login',
-            json={
-                'username': 'flask',
-                'password': 'secret'
-            },
-        )
+        exception = None
+        try:
+            client.post(  # type: ignore
+                '/auth/login',
+                json={
+                    'username': 'flask',
+                    'password': 'secret'
+                },
+            )
+        except Exception as err:
+            exception = err
 
         assert get_validator_schema(mock_validate_schema) == schemas.LOGIN
 
         mock_user.find_by_username.assert_called_once_with('flask')
 
-        assert response.status_code == HTTPStatus.UNAUTHORIZED
+        mock_build_general_error.assert_called_once_with('login_failed')
+
+        assert exception is not None
+        assert isinstance(exception, Exception)
+        assert str(exception) == 'login error'
 
 
 class TestLogout(object):
