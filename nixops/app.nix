@@ -47,6 +47,17 @@ rec {
     '';
   };
 
+  flask_migrate = ps: ps.flask_migrate.overridePythonAttrs (old: rec {
+    version = "2.5.2";
+    src = ps.fetchPypi {
+      inherit (old) pname;
+      inherit version;
+      sha256 = "00nm76w4xymsiih6hq8y46wp026v7zkzq15cx39hp929ba3z2vx9";
+    };
+    checkInputs = old.checkInputs ++ [ ps.flask_script ];
+    propagatedBuildInputs = with ps; [ flask flask_sqlalchemy alembic ];
+  });
+
   pyrsistent = ps: ps.pyrsistent.overridePythonAttrs (old: rec {
     pname = "pyrsistent";
     version = "0.14.11";
@@ -98,7 +109,6 @@ rec {
 
   libraries = ps: [
     ps.flask
-    ps.flask_migrate
     ps.flask_sqlalchemy
     ps.flask-cors
     ps.flask-restful
@@ -106,6 +116,7 @@ rec {
     ps.passlib
     ps.wrapt
     (flask-jwt-extended ps)
+    (flask_migrate ps)
     (jsonschema ps)
   ];
 }

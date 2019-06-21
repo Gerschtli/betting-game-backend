@@ -45,13 +45,14 @@ let
 
   flake8-quotes = python36Packages.buildPythonPackage rec {
     pname = "flake8-quotes";
-    version = "1.0.0";
+    version = "2.0.1";
 
     src = python36Packages.fetchPypi {
       inherit pname version;
-      sha256 = "09ib440hrf5bbsmdbqzbcpkkqqnqdwkaawbqz93bbwxwifnjg4gx";
+      sha256 = "0f10q2580bzxmr0lic42q32qbyf3aq42di91wyl04hrd8xmszj8h";
     };
 
+    doCheck = false;
     propagatedBuildInputs = [ python36Packages.flake8 ];
   };
 in
@@ -59,7 +60,7 @@ in
 (import ./.).overrideDerivation (old: {
   name = old.pname;
 
-  buildInputs = old.buildInputs
+  propagatedBuildInput = old.propagatedBuildInputs
     ++ (with python36Packages; [
       coverage
       flake8
