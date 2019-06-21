@@ -119,4 +119,10 @@ rec {
     (flask_migrate ps)
     (jsonschema ps)
   ];
+
+  devLibraries = ps: [
+    ps.freezegun
+    ps.pytest
+    ps.pytestrunner
+  ];
 }

@@ -55,17 +55,17 @@ let
     doCheck = false;
     propagatedBuildInputs = [ python36Packages.flake8 ];
   };
+
+  app = import ./nixops/app.nix;
 in
 
-(import ./.).overrideDerivation (old: {
-  name = old.pname;
-
-  propagatedBuildInput = old.propagatedBuildInputs
+mkShell {
+  buildInputs = app.libraries python36Packages
+    ++ app.devLibraries python36Packages
     ++ (with python36Packages; [
       coverage
       flake8
       flake8-quotes
-      freezegun
       git-crypt
       isort
       mypy_
@@ -74,4 +74,4 @@ in
 
   APP_CONFIG_FILE = toString app/config/cli.py;
   PYTHONDONTWRITEBYTECODE = 1;
-})
+}
