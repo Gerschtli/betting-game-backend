@@ -66,7 +66,7 @@ class TestMinLength(object):
         matcher = MinLength(3)
 
         assert matcher.validate(value, {}) == [{
-            'type': 'min_length',
+            'type': 'min',
             'options': {
                 'value': 3
             },

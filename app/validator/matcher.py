@@ -39,7 +39,7 @@ class MinLength(Matcher):
         if len(data) >= self.min_length:
             return []
 
-        return [_error('min_length', {'value': self.min_length})]
+        return [_error('min', {'value': self.min_length})]
 
 
 class Required(Matcher):
