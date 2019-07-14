@@ -1,10 +1,11 @@
-__pycache__/
-.coverage
-.mypy_cache/
-.pytest_cache/
 *.egg-info/
 *.nixops-*
 *.pyc
+.coverage
+.env-bins/
+.mypy_cache/
+.pytest_cache/
+__pycache__/
 htmlcov/
 nixops/dev.nixops
 result
