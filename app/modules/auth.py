@@ -24,7 +24,7 @@ class Login(Resource):
         current_user = models.User.find_by_username(data['username'])
 
         if not current_user or not models.User.verify_hash(data['password'], current_user.password):
-            raise InputValidationError.build_general_error('login_failed')
+            raise InputValidationError.build_general_error('loginFailed')
 
         access_token = flask_jwt_extended.create_access_token(identity=current_user)
         decoded_token = flask_jwt_extended.decode_token(access_token)

@@ -113,7 +113,7 @@ class TestLogin(object):
         mock_user.find_by_username.assert_called_once_with('flask')
         mock_user.verify_hash.assert_called_once_with('secret', 'hash')
 
-        mock_build_general_error.assert_called_once_with('login_failed')
+        mock_build_general_error.assert_called_once_with('loginFailed')
 
         assert exception is not None
         assert isinstance(exception, Exception)
@@ -150,7 +150,7 @@ class TestLogin(object):
 
         mock_user.find_by_username.assert_called_once_with('flask')
 
-        mock_build_general_error.assert_called_once_with('login_failed')
+        mock_build_general_error.assert_called_once_with('loginFailed')
 
         assert exception is not None
         assert isinstance(exception, Exception)
