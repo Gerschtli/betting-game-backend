@@ -33,7 +33,7 @@ class Invitations(AdminResource):
     @validate_schema(schemas.INVITATION)
     @validate_input({
         'email': matcher.And(
-            matcher.NotBlank(),
+            matcher.Required(),
             matcher.UniqueInvitationEmail(),
         ),
     })
@@ -58,7 +58,7 @@ class Invitation(AdminResource):
     @validate_input({
         'email':
         matcher.And(
-            matcher.NotBlank(),
+            matcher.Required(),
             matcher.UniqueInvitationEmail(ignore_id=True),
         ),
     })

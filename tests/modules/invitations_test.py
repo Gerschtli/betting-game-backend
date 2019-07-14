@@ -79,7 +79,7 @@ class TestInvitations(object):
         assert list(schema.keys()) == ['email']
         assert isinstance(schema['email'], matcher.And)
         assert len(schema['email'].matchers) == 2
-        assert isinstance(schema['email'].matchers[0], matcher.NotBlank)
+        assert isinstance(schema['email'].matchers[0], matcher.Required)
         assert isinstance(schema['email'].matchers[1], matcher.UniqueInvitationEmail)
         assert not schema['email'].matchers[1].ignore_id
 
@@ -132,7 +132,7 @@ class TestInvitation(object):
         assert list(schema.keys()) == ['email']
         assert isinstance(schema['email'], matcher.And)
         assert len(schema['email'].matchers) == 2
-        assert isinstance(schema['email'].matchers[0], matcher.NotBlank)
+        assert isinstance(schema['email'].matchers[0], matcher.Required)
         assert isinstance(schema['email'].matchers[1], matcher.UniqueInvitationEmail)
         assert schema['email'].matchers[1].ignore_id
 
@@ -173,7 +173,7 @@ class TestInvitation(object):
         assert list(schema.keys()) == ['email']
         assert isinstance(schema['email'], matcher.And)
         assert len(schema['email'].matchers) == 2
-        assert isinstance(schema['email'].matchers[0], matcher.NotBlank)
+        assert isinstance(schema['email'].matchers[0], matcher.Required)
         assert isinstance(schema['email'].matchers[1], matcher.UniqueInvitationEmail)
         assert schema['email'].matchers[1].ignore_id
 

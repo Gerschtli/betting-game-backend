@@ -15,11 +15,11 @@ class Users(Resource):
     @validate_schema(schemas.USER)
     @validate_input({
         'username': matcher.And(
-            matcher.NotBlank(),
+            matcher.Required(),
             matcher.UniqueUsername(),
         ),
         'password': matcher.MinLength(6),
-        'email': matcher.NotBlank(),
+        'email': matcher.Required(),
     })
     @staticmethod
     def post() -> Response:

@@ -42,12 +42,12 @@ class MinLength(Matcher):
         return [_error('min_length', {'value': self.min_length})]
 
 
-class NotBlank(Matcher):
+class Required(Matcher):
     def validate(self, data: str, params: Dict[str, Any]) -> List[Dict[str, Any]]:
         if data:
             return []
 
-        return [_error('not_blank')]
+        return [_error('required')]
 
 
 class UniqueInvitationEmail(Matcher):

@@ -51,11 +51,11 @@ class TestUsers(object):
         assert list(schema.keys()) == ['username', 'password', 'email']
         assert isinstance(schema['username'], matcher.And)
         assert len(schema['username'].matchers) == 2
-        assert isinstance(schema['username'].matchers[0], matcher.NotBlank)
+        assert isinstance(schema['username'].matchers[0], matcher.Required)
         assert isinstance(schema['username'].matchers[1], matcher.UniqueUsername)
         assert isinstance(schema['password'], matcher.MinLength)
         assert schema['password'].min_length == 6
-        assert isinstance(schema['email'], matcher.NotBlank)
+        assert isinstance(schema['email'], matcher.Required)
 
         mock_user.generate_hash.assert_called_once_with('secret')
         mock_user.assert_called_once_with(

@@ -2,7 +2,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from app.validator.matcher import (And, Matcher, MinLength, NotBlank, UniqueInvitationEmail,
+from app.validator.matcher import (And, Matcher, MinLength, Required, UniqueInvitationEmail,
                                    UniqueUsername)
 
 
@@ -73,9 +73,9 @@ class TestMinLength(object):
         }]
 
 
-class TestNotBlank(object):
+class TestRequired(object):
     def test_subclass(self) -> None:
-        assert issubclass(NotBlank, Matcher)
+        assert issubclass(Required, Matcher)
 
     @pytest.mark.parametrize(
         'value',
@@ -87,14 +87,14 @@ class TestNotBlank(object):
         ],
     )
     def test_success(self, value: str) -> None:
-        matcher = NotBlank()
+        matcher = Required()
 
         assert matcher.validate(value, {}) == []
 
     def test_fail(self) -> None:
-        matcher = NotBlank()
+        matcher = Required()
 
-        assert matcher.validate('', {}) == [{'type': 'not_blank'}]
+        assert matcher.validate('', {}) == [{'type': 'required'}]
 
 
 class TestUniqueInvitationEmail(object):
