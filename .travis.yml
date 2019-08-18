@@ -13,6 +13,7 @@ matrix:
         - export APP_CONFIG_FILE=$PWD/app/config/dev.py
         # remove encrypted file
         - rm app/config/prod.py
+        - mv app/config/smtp.py.dist app/config/smtp.py
       script:
         - ./ci/lint.sh
         - coverage run setup.py test
