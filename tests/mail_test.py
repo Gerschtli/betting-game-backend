@@ -38,7 +38,7 @@ def test_send_mail(
         )
 
         mock_message.assert_called_once_with()
-        mock_config.assert_has_calls([  # type: ignore
+        mock_config.assert_has_calls([
             call('APP_EMAIL_SENDER_NAME'),
             call('APP_EMAIL_SENDER_MAIL'),
         ])
