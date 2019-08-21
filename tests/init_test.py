@@ -11,6 +11,7 @@ from app.config import default as default_config
 @patch('logging.basicConfig')
 @patch('flask_migrate.Migrate', autospec=True)
 @patch('flask_cors.CORS', autospec=True)
+@patch('app.mail.mail')
 @patch('app.jwt.jwt', autospec=True)
 @patch('app.models.db')
 @patch('flask.Flask', autospec=True)
@@ -18,6 +19,7 @@ def test_create_app(
         mock_flask: Mock,
         mock_db: Mock,
         mock_jwt: Mock,
+        mock_mail: Mock,
         mock_cors: Mock,
         mock_migrate: Mock,
         mock_basic_config: Mock,
@@ -41,6 +43,7 @@ def test_create_app(
 
     mock_db.init_app.assert_called_once_with(flask_instance)
     mock_jwt.init_app.assert_called_once_with(flask_instance)
+    mock_mail.init_app.assert_called_once_with(flask_instance)
     mock_cors.assert_called_once_with(flask_instance)
     mock_migrate.assert_called_once_with(flask_instance, mock_db)
 

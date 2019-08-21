@@ -5,7 +5,7 @@ import flask
 import flask_cors
 import flask_migrate
 
-from . import errors, jwt, models, modules
+from . import errors, jwt, mail, models, modules
 from .config import default as default_config
 
 
@@ -16,6 +16,7 @@ def create_app() -> flask.Flask:
 
     models.db.init_app(app)
     jwt.jwt.init_app(app)
+    mail.mail.init_app(app)
     flask_cors.CORS(app)
     flask_migrate.Migrate(app, models.db)
 

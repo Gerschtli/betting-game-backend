@@ -109,6 +109,7 @@ rec {
 
   libraries = ps: [
     ps.flask
+    ps.flask_mail
     ps.flask_sqlalchemy
     ps.flask-cors
     ps.flask-restful
