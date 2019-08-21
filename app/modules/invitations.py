@@ -1,11 +1,11 @@
-import uuid
 from typing import Dict, List
 
 from flask import Blueprint
 from flask_restful import Api
 from werkzeug.exceptions import NotFound
 
-from .. import models, request, time
+from .. import config, mail, models, request, time, uuid
+from ..errors import InputValidationError
 from ..resource import AdminResource
 from ..response import Response, no_content
 from ..validator import matcher, schemas, validate_input, validate_schema
@@ -41,10 +41,22 @@ class Invitations(AdminResource):
     def post() -> Response:
         data = request.get_json()
 
+        email = data['email']
+        token = uuid.generate()
+        link = '{}/invitation/{}'.format(config.get('APP_BASE_URL'), token)
+
+        success = mail.send_mail(email, 'invitation', {
+            'project_name': config.get('APP_PROJECT_NAME'),
+            'link': link,
+        })
+
+        if not success:
+            raise InputValidationError.build_general_error('mailSendFailed')
+
         invitation = models.Invitation(
-            email=data['email'],
+            email=email,
             is_admin=data['is_admin'],
-            token=uuid.uuid4(),
+            token=token,
             expires=time.get_invitation_expire(),
         )
         invitation.save()

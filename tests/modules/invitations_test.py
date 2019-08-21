@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, call, patch
 
 from flask import Blueprint, Flask
 
@@ -44,19 +44,21 @@ class TestInvitations(object):
         assert response.status_code == HTTPStatus.OK
 
     @patch('app.models.Invitation')
-    @patch('uuid.uuid4')
     @patch('app.time.get_invitation_expire')
+    @patch('app.mail.send_mail')
+    @patch('app.config.get')
+    @patch('app.uuid.generate')
     @patch('app.validator._validate_input')
     @patch('app.validator._validate_schema')
-    def test_post(self, mock_validate_schema: Mock, mock_validate_input: Mock,
-                  mock_get_invitation_expire: Mock, mock_uuid4: Mock, mock_invitation: Mock,
-                  app: Flask) -> None:
+    def test_post(self, mock_validate_schema: Mock, mock_validate_input: Mock, mock_uuid: Mock,
+                  mock_config: Mock, mock_send_mail: Mock, mock_get_invitation_expire: Mock,
+                  mock_invitation: Mock, app: Flask) -> None:
         mock_validate_schema.side_effect = validator_call_through
         mock_validate_input.side_effect = validator_call_through
-
+        mock_uuid.return_value = 'uuid-value'
+        mock_config.side_effect = ['http://base', 'name']
+        mock_send_mail.return_value = True
         mock_get_invitation_expire.return_value = 123
-
-        mock_uuid4.return_value = 'uuid value'
 
         invitation_instance = mock_invitation.return_value
 
@@ -83,18 +85,87 @@ class TestInvitations(object):
         assert isinstance(schema['email'].matchers[1], matcher.UniqueInvitationEmail)
         assert not schema['email'].matchers[1].ignore_id
 
+        mock_uuid.assert_called_once_with()
+        mock_config.assert_has_calls([
+            call('APP_BASE_URL'),
+            call('APP_PROJECT_NAME'),
+        ])
+        mock_send_mail.assert_called_once_with('mail', 'invitation', {
+            'project_name': 'name',
+            'link': 'http://base/invitation/uuid-value',
+        })
         mock_get_invitation_expire.assert_called_once_with()
 
         mock_invitation.assert_called_once_with(
             email='mail',
             is_admin=True,
-            token='uuid value',
+            token='uuid-value',
             expires=123,
         )
         invitation_instance.save.assert_called_once_with()
 
         assert response.data == b''
         assert response.status_code == HTTPStatus.NO_CONTENT
+
+    @patch('app.errors.InputValidationError.build_general_error')
+    @patch('app.mail.send_mail')
+    @patch('app.config.get')
+    @patch('app.uuid.generate')
+    @patch('app.validator._validate_input')
+    @patch('app.validator._validate_schema')
+    def test_post_with_error(self, mock_validate_schema: Mock, mock_validate_input: Mock,
+                             mock_uuid: Mock, mock_config: Mock, mock_send_mail: Mock,
+                             mock_build_general_error: Mock, app: Flask) -> None:
+        mock_validate_schema.side_effect = validator_call_through
+        mock_validate_input.side_effect = validator_call_through
+        mock_uuid.return_value = 'uuid-value'
+        mock_config.side_effect = ['http://base', 'name']
+        mock_send_mail.return_value = False
+
+        mock_build_general_error.return_value = Exception('mail error')
+
+        app.register_blueprint(invitations.module)
+
+        client = app.test_client()
+
+        exception = None
+        try:
+            client.post(  # type: ignore
+                '/invitations',
+                headers=build_authorization_headers(app, is_admin=True),
+                json={
+                    'email': 'mail',
+                    'is_admin': True,
+                },
+            )
+        except Exception as err:
+            exception = err
+
+        assert get_validator_schema(mock_validate_schema) == schemas.INVITATION
+        schema = get_validator_schema(mock_validate_input)
+
+        assert list(schema.keys()) == ['email']
+        assert isinstance(schema['email'], matcher.And)
+        assert len(schema['email'].matchers) == 2
+        assert isinstance(schema['email'].matchers[0], matcher.Required)
+        assert isinstance(schema['email'].matchers[1], matcher.UniqueInvitationEmail)
+        assert not schema['email'].matchers[1].ignore_id
+
+        mock_uuid.assert_called_once_with()
+        mock_config.assert_has_calls([
+            call('APP_BASE_URL'),
+            call('APP_PROJECT_NAME'),
+        ])
+        mock_send_mail.assert_called_once_with('mail', 'invitation', {
+            'project_name': 'name',
+            'link': 'http://base/invitation/uuid-value',
+        })
+
+        mock_build_general_error.assert_called_once_with('mailSendFailed')
+
+        assert exception is not None
+        assert isinstance(exception, Exception)
+        assert str(exception) == 'mail error'
 
 
 class TestInvitation(object):

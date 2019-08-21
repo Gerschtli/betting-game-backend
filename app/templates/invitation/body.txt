@@ -1,0 +1,11 @@
+Hallo,
+
+Du wurdest eingeladen, beim {{ project_name }} mitzumachen.
+
+Wenn Du die Einladung annehmen möchtest, klicke auf folgenden Link und richte
+deinen Account ein!
+
+{{ link }}
+
+Liebe Grüße,
+das {{ project_name }} Team
