@@ -1,4 +1,3 @@
-import uuid
 from unittest.mock import Mock, patch
 
 from app.uuid import generate
