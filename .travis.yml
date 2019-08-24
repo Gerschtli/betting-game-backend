@@ -21,5 +21,7 @@ matrix:
         - codecov
 
     - language: nix
+      before_script:
+        - mv app/config/smtp.py.dist app/config/smtp.py
       script:
         - nix build --verbose
