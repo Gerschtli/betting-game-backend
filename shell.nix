@@ -19,9 +19,4 @@ mkShell {
 
   APP_CONFIG_FILE = toString app/config/cli.py;
   PYTHONDONTWRITEBYTECODE = 1;
-
-  shellHook = ''
-    mkdir -p .env-bins
-    ln -snf ${python36}/bin/python .env-bins/python
-  '';
 }
