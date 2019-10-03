@@ -32,7 +32,7 @@ class TestInvitations(object):
 
         client = app.test_client()
 
-        response = client.get(  # type: ignore
+        response = client.get(
             '/invitations',
             headers=build_authorization_headers(app, is_admin=True),
         )
@@ -66,7 +66,7 @@ class TestInvitations(object):
 
         client = app.test_client()
 
-        response = client.post(  # type: ignore
+        response = client.post(
             '/invitations',
             headers=build_authorization_headers(app, is_admin=True),
             json={
@@ -130,7 +130,7 @@ class TestInvitations(object):
 
         exception = None
         try:
-            client.post(  # type: ignore
+            client.post(
                 '/invitations',
                 headers=build_authorization_headers(app, is_admin=True),
                 json={
@@ -188,7 +188,7 @@ class TestInvitation(object):
 
         client = app.test_client()
 
-        response = client.put(  # type: ignore
+        response = client.put(
             '/invitations/321',
             headers=build_authorization_headers(app, is_admin=True),
             json={
@@ -229,7 +229,7 @@ class TestInvitation(object):
 
         client = app.test_client()
 
-        response = client.put(  # type: ignore
+        response = client.put(
             '/invitations/321',
             headers=build_authorization_headers(app, is_admin=True),
             json={
@@ -262,7 +262,7 @@ class TestInvitation(object):
 
         client = app.test_client()
 
-        response = client.delete(  # type: ignore
+        response = client.delete(
             '/invitations/321',
             headers=build_authorization_headers(app, is_admin=True),
         )
@@ -281,7 +281,7 @@ class TestInvitation(object):
 
         client = app.test_client()
 
-        response = client.delete(  # type: ignore
+        response = client.delete(
             '/invitations/321',
             headers=build_authorization_headers(app, is_admin=True),
         )

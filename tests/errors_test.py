@@ -102,7 +102,7 @@ class TestRegisterErrorHandler(object):
 
         client = app.test_client()
 
-        response = client.get('/')  # type: ignore
+        response = client.get('/')
 
         assert response.is_json
         assert response.headers.get('Content-Type') == 'application/json'

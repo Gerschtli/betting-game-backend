@@ -50,7 +50,7 @@ class TestLogin(object):
 
         client = app.test_client()
 
-        response = client.post(  # type: ignore
+        response = client.post(
             '/auth/login',
             json={
                 'username': 'flask',
@@ -98,7 +98,7 @@ class TestLogin(object):
 
         exception = None
         try:
-            client.post(  # type: ignore
+            client.post(
                 '/auth/login',
                 json={
                     'username': 'flask',
@@ -136,7 +136,7 @@ class TestLogin(object):
 
         exception = None
         try:
-            client.post(  # type: ignore
+            client.post(
                 '/auth/login',
                 json={
                     'username': 'flask',
@@ -175,7 +175,7 @@ class TestLogout(object):
 
         client = app.test_client()
 
-        response = client.post('/auth/logout')  # type: ignore
+        response = client.post('/auth/logout')
 
         mock_get_jwt.assert_called_once_with()
 
@@ -197,7 +197,7 @@ class TestLogout(object):
 
         client = app.test_client()
 
-        response = client.post('/auth/logout')  # type: ignore
+        response = client.post('/auth/logout')
 
         mock_get_jwt.assert_called_once_with()
 
@@ -214,7 +214,7 @@ class TestLogout(object):
 
         client = app.test_client()
 
-        response = client.post('/auth/logout')  # type: ignore
+        response = client.post('/auth/logout')
 
         mock_get_jwt.assert_called_once_with()
 

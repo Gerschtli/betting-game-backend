@@ -35,7 +35,7 @@ class TestUsers(object):
 
         client = app.test_client()
 
-        response = client.post(  # type: ignore
+        response = client.post(
             '/users',
             json={
                 'username': 'flask',
