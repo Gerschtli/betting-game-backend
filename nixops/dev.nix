@@ -36,22 +36,6 @@ in
       {
         networking.firewall.allowedTCPPorts = [ config.services.mysql.port ];
 
-        nixpkgs.overlays = [
-          # fix reloading bug in flask development server
-          # see https://github.com/NixOS/nixpkgs/issues/42924#issuecomment-409101368
-          (self: super: {
-            python36Packages = (super.python36Packages or {}) // {
-              werkzeug = super.python36Packages.werkzeug.overrideAttrs (oldAttrs: rec {
-                postPatch = ''
-                  substituteInPlace werkzeug/_reloader.py \
-                    --replace "rv = [sys.executable]" "return sys.argv"
-                '';
-                doCheck = false;
-              });
-            };
-          })
-        ];
-
         services.mysql = {
           # Need to run:
           # CREATE DATABASE betting_game;

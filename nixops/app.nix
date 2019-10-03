@@ -12,6 +12,8 @@ rec {
       allowPing = true;
     };
 
+    nixpkgs.pkgs = import ./nixpkgs.nix;
+
     time.timeZone = "Europe/Berlin";
 
     users = {
