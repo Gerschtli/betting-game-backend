@@ -18,30 +18,6 @@ import ((import <nixpkgs> { }).fetchzip (import ./nixpkgs-version.nix)) {
             propagatedBuildInputs = with self.python36Packages; [ flask flask_sqlalchemy alembic ];
           });
 
-          pyrsistent = super.python36Packages.pyrsistent.overridePythonAttrs (old: rec {
-            pname = "pyrsistent";
-            version = "0.14.11";
-
-            src = super.python36Packages.fetchPypi {
-              inherit pname version;
-              sha256 = "1qkh74bm296mp5g3r11lgsksr6bh4w1bf8pji4nmxdlfj542ga1w";
-            };
-          });
-
-          perf = super.python36Packages.buildPythonPackage rec {
-            pname = "perf";
-            version = "1.6.0";
-
-            src = super.python36Packages.fetchPypi {
-              inherit pname version;
-              sha256 = "1vrv83v8rhyl51yaxlqzw567vz5a9qwkymk3vqvcl5sa2yd3mzgp";
-            };
-
-            doCheck = false;
-
-            propagatedBuildInputs = with self.python36Packages; [ six ];
-          };
-
           jsonschema = super.python36Packages.jsonschema.overridePythonAttrs (old: rec {
             version = "3.0.1";
 
@@ -59,6 +35,30 @@ import ((import <nixpkgs> { }).fetchzip (import ./nixpkgs-version.nix)) {
               setuptools_scm
               six
             ];
+          });
+
+          perf = super.python36Packages.buildPythonPackage rec {
+            pname = "perf";
+            version = "1.6.0";
+
+            src = super.python36Packages.fetchPypi {
+              inherit pname version;
+              sha256 = "1vrv83v8rhyl51yaxlqzw567vz5a9qwkymk3vqvcl5sa2yd3mzgp";
+            };
+
+            doCheck = false;
+
+            propagatedBuildInputs = with self.python36Packages; [ six ];
+          };
+
+          pyrsistent = super.python36Packages.pyrsistent.overridePythonAttrs (old: rec {
+            pname = "pyrsistent";
+            version = "0.14.11";
+
+            src = super.python36Packages.fetchPypi {
+              inherit pname version;
+              sha256 = "1qkh74bm296mp5g3r11lgsksr6bh4w1bf8pji4nmxdlfj542ga1w";
+            };
           });
         };
       }
@@ -117,6 +117,16 @@ import ((import <nixpkgs> { }).fetchzip (import ./nixpkgs-version.nix)) {
               inherit version;
               sha256 = "15bx773a5zkk4hkwjl8nb5f8y5741vyyqb9q3jac6kxm1frk5mif";
             };
+          });
+
+          # fix reloading bug in flask development server
+          # see https://github.com/NixOS/nixpkgs/issues/42924#issuecomment-409101368
+          werkzeug = super.python36Packages.werkzeug.overrideAttrs (oldAttrs: rec {
+            postPatch = ''
+              substituteInPlace werkzeug/_reloader.py \
+                --replace "rv = [sys.executable]" "return sys.argv"
+            '';
+            doCheck = false;
           });
         };
       }
