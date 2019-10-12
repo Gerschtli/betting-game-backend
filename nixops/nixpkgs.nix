@@ -115,14 +115,14 @@ import ((import <nixpkgs> { }).fetchzip (import ./nixpkgs-version.nix)) {
               };
             });
 
-            # fix reloading bug in flask development server
-            # see https://github.com/NixOS/nixpkgs/issues/42924#issuecomment-409101368
-            werkzeug = super.werkzeug.overrideAttrs (oldAttrs: rec {
-              postPatch = ''
-                substituteInPlace werkzeug/_reloader.py \
-                  --replace "rv = [sys.executable]" "return sys.argv"
-              '';
-              doCheck = false;
+            werkzeug = super.werkzeug.overridePythonAttrs (old: rec {
+              version = "0.16.0";
+
+              src = super.fetchPypi {
+                inherit (old) pname;
+                inherit version;
+                sha256 = "1rrklk7567pwdmd1694pwad8yd3bdhc74fg2dwj3nwxm8x3r503j";
+              };
             });
 
           };
